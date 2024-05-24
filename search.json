@@ -1,0 +1,569 @@
+[
+  {
+    "objectID": "slides.html#topics",
+    "href": "slides.html#topics",
+    "title": "Intro to research toolbox",
+    "section": "Topics",
+    "text": "Topics\n\nIntroduction & learning plan\nGetting comfortable with R\nProgramming fundamentals\nData cleaning\nData visualisation\nStatistical analysis\nPresentation of results"
+  },
+  {
+    "objectID": "slides.html#motivation",
+    "href": "slides.html#motivation",
+    "title": "Intro to research toolbox",
+    "section": "Motivation",
+    "text": "Motivation\n\nAdded tools to your toolbox\nTransferrable skill\nLearning how to program in 1 language helps you learn other languages\nLeverage on open source tools/projects written by others"
+  },
+  {
+    "objectID": "slides.html#learning-plan",
+    "href": "slides.html#learning-plan",
+    "title": "Intro to research toolbox",
+    "section": "Learning plan",
+    "text": "Learning plan\n\nThe topics in this deck mirror the workflow of a project\n\n\n\n\n\n\nflowchart LR\n  D[Data exported\\nfrom REDCAP]--&gt;C[Data cleaning]\n  C--&gt;S[Statistical analysis]\n  S--&gt;P[Presentation\\nof results]\n\n\n\n\n\n\n\nThe game plan is to first do a quick pass through from data cleaning to analysis:\n\nTake a toy dataset\n“Clean” the data (minimally)\nRun a regression model\n\nOnce we have gotten comfortable with R, we will explore each topic in greater detail\n\nData cleaning\nProgramming fundamentals\nAnalysis: generalised linear models\nPresentation of results"
+  },
+  {
+    "objectID": "slides.html#resources",
+    "href": "slides.html#resources",
+    "title": "Intro to research toolbox",
+    "section": "Resources",
+    "text": "Resources\n\nR courses\nThe Epidemiologist R Handbook\nR for Data Science\nAdvanced R\nCheat Sheets"
+  },
+  {
+    "objectID": "slides.html#what-is-an-r-package",
+    "href": "slides.html#what-is-an-r-package",
+    "title": "Intro to research toolbox",
+    "section": "What is an R package?",
+    "text": "What is an R package?\n\nIt is a collection of code/data written by someone and packaged for distribution\nHosted on the Comprehensive R Archive Network and/or Github for public download\nFrom the CRAN webpage, we are able to find a reference manual documenting the data/functions of the package\nFrom the Github repository, we are able to see the actual codes implemented by the package’s author(s)\nTo install a package we would run install.packages(\"palmerpenguins\") in the console\nTo load a package, we would run library(palmerpenguins)\nTo uninstall a package we would run remove.packages(\"palmerpenguins\") in the console"
+  },
+  {
+    "objectID": "slides.html#demo-intro-to-rstudio-workspace",
+    "href": "slides.html#demo-intro-to-rstudio-workspace",
+    "title": "Intro to research toolbox",
+    "section": "[DEMO] Intro to RStudio workspace",
+    "text": "[DEMO] Intro to RStudio workspace\n\nConsole: where you run/execute lines of code\nTo assign a variable, we use the &lt;- operator\n\nx &lt;- 1:10; print(x)\n\n [1]  1  2  3  4  5  6  7  8  9 10\n\n\n\nrandom-access memory is allocated when a variable is assigned/declared\nrandom-access memory is freed-up when the variable is deleted (or garbage collected if it goes out of scope)\n\nEnvironment: where you’re able to see variables stored in random-access memory\n\nTo clear variables from environment \\(\\rightarrow\\) execute rm(list = ls()) in console"
+  },
+  {
+    "objectID": "slides.html#demo-intro-to-rstudio-workspace-1",
+    "href": "slides.html#demo-intro-to-rstudio-workspace-1",
+    "title": "Intro to research toolbox",
+    "section": "[DEMO] Intro to RStudio workspace",
+    "text": "[DEMO] Intro to RStudio workspace\n\nScript\n\nWriting code and saving the script\nExecute single/multiple lines of code \\(\\rightarrow\\) highlight code + Ctrl-enter\nRuns from top to bottom\nComments will not be executed\n\nHotkeys\n\nClear the console \\(\\rightarrow\\) Ctrl-l\nClear a line in console \\(\\rightarrow\\) Ctrl-d"
+  },
+  {
+    "objectID": "slides.html#practise-tasks-to-do",
+    "href": "slides.html#practise-tasks-to-do",
+    "title": "Intro to research toolbox",
+    "section": "[PRACTISE] Tasks to do",
+    "text": "[PRACTISE] Tasks to do\n\nFor this task, you will need the palmerpenguins and tidyverse packages. Install them if you have not already done so\nWe will make use of the penguins dataset from palmerpenguins package\nUnderstand the data\nDichotomise body_mass_g (continuous) into a categorical variable with 2 categories (“light”: &lt;= 4750g and “heavy”: &gt; 4750g)\nRun a linear regression1 with body_mass_g as the dependent variable and independent variables: species, bill_length_mm, bill_depth_mm, flipper_length_mm and sex\nRun a logistic regression with the categorical body mass variable you created earlier as the dependent variable, with the same independent variables as before\n\nNote: the model is for learning purpose. No clever reason for choosing the variables"
+  },
+  {
+    "objectID": "slides.html#data-types",
+    "href": "slides.html#data-types",
+    "title": "Intro to research toolbox",
+    "section": "Data types",
+    "text": "Data types\n\n\nCharacter data type e.g. \"a\"\n\n\ntypeof(\"a\")\n\n\n[1] \"character\"\n\n\n\nInteger data type e.g. 1L\n\n\ntypeof(1L)\n\n\n[1] \"integer\"\n\n\n\nNumeric data type e.g. 5.0\n\n\ntypeof(5.0)\n\n\n[1] \"double\"\n\n\n\nLogical data type e.g. TRUE or FALSE\n\n\ntypeof(TRUE)\n\n\n[1] \"logical\"\n\n\n\nComplex data type e.g. 1 + 4i\n\n\ntypeof(1 + 4i)\n\n\n[1] \"complex\""
+  },
+  {
+    "objectID": "slides.html#data-types-continued",
+    "href": "slides.html#data-types-continued",
+    "title": "Intro to research toolbox",
+    "section": "Data types (continued)",
+    "text": "Data types (continued)\n\nFactor datatype for working with categorical variables\n\nx &lt;- factor(sample(c(\"Malay\", \"Others\", \"Indian\", \"Chinese\"), 10, replace = T),\n            levels = c(\"Chinese\", \"Malay\", \"Indian\", \"Others\"))\nprint(x)\n\n [1] Indian  Chinese Malay   Malay   Chinese Chinese Chinese Malay   Malay  \n[10] Others \nLevels: Chinese Malay Indian Others\n\n\n\nprint(levels(x))\n\n[1] \"Chinese\" \"Malay\"   \"Indian\"  \"Others\" \n\n\nA factor variable is more useful than a plain character vector. E.g. the first level will be used by glm as the reference category"
+  },
+  {
+    "objectID": "slides.html#data-structures-vectors",
+    "href": "slides.html#data-structures-vectors",
+    "title": "Intro to research toolbox",
+    "section": "Data structures (vectors)",
+    "text": "Data structures (vectors)\n\n\nData structures are containers for holding data\nA character vector holds multiple characters\n\n\nletters\n\n\n [1] \"a\" \"b\" \"c\" \"d\" \"e\" \"f\" \"g\" \"h\" \"i\" \"j\" \"k\" \"l\" \"m\" \"n\" \"o\" \"p\" \"q\" \"r\" \"s\"\n[20] \"t\" \"u\" \"v\" \"w\" \"x\" \"y\" \"z\"\n\n\n\n\n\ntypeof(letters)\n\n\n[1] \"character\"\n\n\n\nA numeric vector holds multiple numbers\n\n\nx &lt;- 1:5; print(x)\n\n\n[1] 1 2 3 4 5\n\n\n\n\n\ntypeof(x)\n\n\n[1] \"integer\"\n\n\n\n\n\n\n\n\n\n\n\n\nExercise\n\n\n\n\nCan you query the length of your character vector? length(letters)\nCan you slice the character vector to get the first 5 elements? letters[1:5]\nCan you slice the character vector to get the 1st, 9th, 20th elements? letters[c(1, 9, 20)]\nCan you flip the character vector from last to first element? letters[length(letters):1]"
+  },
+  {
+    "objectID": "slides.html#data-structures-lists",
+    "href": "slides.html#data-structures-lists",
+    "title": "Intro to research toolbox",
+    "section": "Data structures (lists)",
+    "text": "Data structures (lists)\n\nVectors can only hold 1 kind of data type e.g. characters, numeric etc\nLists are “containers” that can hold multiple data types\n\nUnnamed lists\n\nlist(\"a\", 1, 10:15)\n\n[[1]]\n[1] \"a\"\n\n[[2]]\n[1] 1\n\n[[3]]\n[1] 10 11 12 13 14 15\n\n\nNamed lists\n\nlist(a = \"a\", b = 1, c = 10:15)\n\n$a\n[1] \"a\"\n\n$b\n[1] 1\n\n$c\n[1] 10 11 12 13 14 15"
+  },
+  {
+    "objectID": "slides.html#data-structures-lists-continued",
+    "href": "slides.html#data-structures-lists-continued",
+    "title": "Intro to research toolbox",
+    "section": "Data structures (lists, continued)",
+    "text": "Data structures (lists, continued)\n\n\n\n\n\n\nExercise\n\n\n\nCreate a variable in your console: mylist &lt;- list(a = \"a\", b = 1, c = 10:15)\nCan you query the length of mylist? length(mylist)\nCan you get the second element of your mylist using\n\nindex: mylist[1]\nkey: mylist$a or mylist[[\"a\"]]\n\nCompare the difference between mylist[3] and mylist[[3]]\nCompare the difference between class(mylist[3]) and class(mylist[[3]])"
+  },
+  {
+    "objectID": "slides.html#data-structures-dataframe",
+    "href": "slides.html#data-structures-dataframe",
+    "title": "Intro to research toolbox",
+    "section": "Data structures (dataframe)",
+    "text": "Data structures (dataframe)\n\n\nDataframe is a tabular container that can hold multiple data types like lists, but each column can only store data of the same data type\nTo view the first 2 rows of the penguins dataset from the palmerpenguins package\n\nlibrary(tidyverse)\nlibrary(palmerpenguins)\npenguins %&gt;% head(2)\n\n\n\n# A tibble: 2 × 8\n  species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g\n  &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;\n1 Adelie  Torgersen           39.1          18.7               181        3750\n2 Adelie  Torgersen           39.5          17.4               186        3800\n# ℹ 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;\n\n\nTo view the last 2 rows of the dataset\n\npenguins %&gt;% tail(2)\n\n\n\n# A tibble: 2 × 8\n  species   island bill_length_mm bill_depth_mm flipper_length_mm body_mass_g\n  &lt;fct&gt;     &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;\n1 Chinstrap Dream            50.8          19                 210        4100\n2 Chinstrap Dream            50.2          18.7               198        3775\n# ℹ 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;\n\n\nTo view the data in rstudio, execute view(penguins)"
+  },
+  {
+    "objectID": "slides.html#data-structures-dataframe-continued",
+    "href": "slides.html#data-structures-dataframe-continued",
+    "title": "Intro to research toolbox",
+    "section": "Data structures (dataframe, continued)",
+    "text": "Data structures (dataframe, continued)\n\n\n\n\n\n\nExercise\n\n\n\nCan you query the dimensions of the penguins dataset using dim(penguins), ncol(penguins), nrow(penguins)?\nCan you get a glimpse of the data using the functions glimpse(penguins)?\nCan you view summary statistics of the data using summary(penguins)?"
+  },
+  {
+    "objectID": "slides.html#data-structures-dataframe-accessing-variables",
+    "href": "slides.html#data-structures-dataframe-accessing-variables",
+    "title": "Intro to research toolbox",
+    "section": "Data structures (dataframe, accessing variables)",
+    "text": "Data structures (dataframe, accessing variables)\n\nTo get the column/variable-names of your dataset\n\ncolnames(penguins)\n\n[1] \"species\"           \"island\"            \"bill_length_mm\"   \n[4] \"bill_depth_mm\"     \"flipper_length_mm\" \"body_mass_g\"      \n[7] \"sex\"               \"year\"             \n\n\nTo access any column variable, we use the $ syntax\n\npenguins$species[1:10]\n\n [1] Adelie Adelie Adelie Adelie Adelie Adelie Adelie Adelie Adelie Adelie\nLevels: Adelie Chinstrap Gentoo\n\n\nTo get a table count of a variable or a cross-table count of 2 variables\n\ntable(penguins$sex, useNA = \"ifany\")\n\n\nfemale   male   &lt;NA&gt; \n   165    168     11 \n\n\nSee Data Cleaning for more ways to work with dataframes"
+  },
+  {
+    "objectID": "slides.html#data-structures-dataframe-loading-data",
+    "href": "slides.html#data-structures-dataframe-loading-data",
+    "title": "Intro to research toolbox",
+    "section": "Data structures (dataframe, loading data)",
+    "text": "Data structures (dataframe, loading data)\n\nTo import data from csv file, use read_csv\nTo import data from an excel file, use read_excel\n\nTo import data from SAS/SPSS/Stata or export from R to these file formats, use the haven package"
+  },
+  {
+    "objectID": "slides.html#data-structures-dataframe-adding-labels",
+    "href": "slides.html#data-structures-dataframe-adding-labels",
+    "title": "Intro to research toolbox",
+    "section": "Data structures (dataframe, adding labels)",
+    "text": "Data structures (dataframe, adding labels)\n\nTo add labels to a dataframe, we make use of the labelled package"
+  },
+  {
+    "objectID": "slides.html#functions",
+    "href": "slides.html#functions",
+    "title": "Intro to research toolbox",
+    "section": "Functions",
+    "text": "Functions\n\nA good chapter on explaining functions is Chapter 6, Advanced R, where most of the examples in the slides are taken\nExample function\n\nf01 &lt;- function(x, y) {\n  # A comment\n  x + y\n}\n\nComponents of a function\n\nArguments \\(\\rightarrow\\) inputs to the function (there can also be functions with no arguments)\nBody \\(\\rightarrow\\) the code inside the function\nEnvironment \\(\\rightarrow\\) a list-like structure that stores/maps the variable name to value (a namespace as some people call it)\n\nFunctions are objects that can be assigned or they can be anonymous functions"
+  },
+  {
+    "objectID": "slides.html#function-invocation",
+    "href": "slides.html#function-invocation",
+    "title": "Intro to research toolbox",
+    "section": "Function invocation",
+    "text": "Function invocation\n\nHow do we invoke the function?\n\nprint(f01)\n\nfunction(x, y) {\n  # A comment\n  x + y\n}\n\nf01(3, 5)\n\n[1] 8\n\n\nHow do we invoke one function after another?\n\nSuppose we have another function f02\n\nf02 &lt;- function(a, b) {\n  a * 10 + b\n}\n\nTo call f01 first followed by f02 and sqrt we will “nest” the functions (inside-out, right to left)\n\nsqrt(f02(f01(1, 2), 5))\n\n[1] 5.91608"
+  },
+  {
+    "objectID": "slides.html#function-invocation-continued",
+    "href": "slides.html#function-invocation-continued",
+    "title": "Intro to research toolbox",
+    "section": "Function invocation (continued)",
+    "text": "Function invocation (continued)\nAnother way to invoke a series of functions is to use the pipe operator %&gt;% provided by the magrittr package\n\nlibrary(magrittr)\nvalue &lt;- 1\nvalue %&gt;%\n  f01(2) %&gt;%\n  f02(5) %&gt;%\n  sqrt()\n\n[1] 5.91608\n\n\n\n\n\n\n\n\nExercise\n\n\n\nWhat is the difference between f02 and f02(1, 2)?"
+  },
+  {
+    "objectID": "slides.html#function-output",
+    "href": "slides.html#function-output",
+    "title": "Intro to research toolbox",
+    "section": "Function output",
+    "text": "Function output\n\nWhat is returned by a function? The last evaluated expression\nHow do we store values outputted from a function? With assignment statment\nEarly termination of a function with a return statement"
+  },
+  {
+    "objectID": "slides.html#functions---argument-passing",
+    "href": "slides.html#functions---argument-passing",
+    "title": "Intro to research toolbox",
+    "section": "Functions - argument passing",
+    "text": "Functions - argument passing\n\nPass by copy vs pass by reference\nIn R, all functions are pass by reference if you don’t modify the object subsequently within the function. i.e. copy-on-modify\nHow to pass arguments?\n\nf04 &lt;- function(x, y, z) {\n  (x / y) * z\n}\n\n\nBy position e.g. f04(10, 50, 20)\nBy name e.g. f04(z = 20, y = 50, x = 10)\nUnpacking multiple named arguments using do.call\n\ndo.call(f04, list(x = 10, y = 50, z = 20))\n\n[1] 4"
+  },
+  {
+    "objectID": "slides.html#functions---lexical-scoping-name-masking",
+    "href": "slides.html#functions---lexical-scoping-name-masking",
+    "title": "Intro to research toolbox",
+    "section": "Functions - lexical scoping, name masking",
+    "text": "Functions - lexical scoping, name masking\nNames defined inside a function mask names defined outside a function\n\nx &lt;- 10\ny &lt;- 20\nf05 &lt;- function() {\n  x &lt;- 1\n  y &lt;- 2\n  c(x, y)\n}\n\nf05()\n\n[1] 1 2"
+  },
+  {
+    "objectID": "slides.html#functions---lexical-scoping-looking-one-level-up",
+    "href": "slides.html#functions---lexical-scoping-looking-one-level-up",
+    "title": "Intro to research toolbox",
+    "section": "Functions - lexical scoping, looking one level up",
+    "text": "Functions - lexical scoping, looking one level up\nR will look up a variable in the enclosing scope (e.g. within the function) and if it’s not found, will continue to proceed upwards (e.g. enclosing function or global environment) to look for the variable until it is found\n\nx &lt;- 1\nf06 &lt;- function() {\n  y &lt;- 2\n  i &lt;- function() {\n    z &lt;- 3\n    c(x, y, z)\n  }\n  i()\n}\n\nf06()\n\n[1] 1 2 3\n\n\n\n\n\n\n\n\nExercise\n\n\nUsing the sample function, change the z variable inside the function and observe that…\n\nz &lt;- 10\nf07 &lt;- function(x, y) {\n  # make your edit here\n  z &lt;- z * 100\n  z + x + y\n}\n\n…there is no change to the z variable outside the function in the global environment"
+  },
+  {
+    "objectID": "slides.html#functions---lexical-scoping-dynamic-lookup",
+    "href": "slides.html#functions---lexical-scoping-dynamic-lookup",
+    "title": "Intro to research toolbox",
+    "section": "Functions - lexical scoping, dynamic lookup",
+    "text": "Functions - lexical scoping, dynamic lookup\nR looks for the values when the function is run, not when the function is created\n\nz &lt;- 10\nf08 &lt;- function(x, y) {\n  z + x + y\n}\n\nz &lt;- 100\nf08(5, 10)\n\n[1] 115"
+  },
+  {
+    "objectID": "slides.html#functions-1",
+    "href": "slides.html#functions-1",
+    "title": "Intro to research toolbox",
+    "section": "Functions",
+    "text": "Functions"
+  },
+  {
+    "objectID": "slides.html#loops",
+    "href": "slides.html#loops",
+    "title": "Intro to research toolbox",
+    "section": "Loops",
+    "text": "Loops"
+  },
+  {
+    "objectID": "slides.html#debugging",
+    "href": "slides.html#debugging",
+    "title": "Intro to research toolbox",
+    "section": "Debugging",
+    "text": "Debugging"
+  },
+  {
+    "objectID": "slides.html#memory-management",
+    "href": "slides.html#memory-management",
+    "title": "Intro to research toolbox",
+    "section": "Memory Management",
+    "text": "Memory Management"
+  },
+  {
+    "objectID": "slides.html#common-functions---packages",
+    "href": "slides.html#common-functions---packages",
+    "title": "Intro to research toolbox",
+    "section": "Common functions - packages",
+    "text": "Common functions - packages\n\nThese functions are from various packages, conveniently collected in the tidyverse package\nThe best package for data wrangling is dplyr. Useful info can be found in this chapter\nA package for working with dates is lubridate\nA package for working with strings is stringr. This is useful for cleaning free-text response data\nA package for working with factor datatype is forcats"
+  },
+  {
+    "objectID": "slides.html#common-functions---dplyrselect",
+    "href": "slides.html#common-functions---dplyrselect",
+    "title": "Intro to research toolbox",
+    "section": "Common functions - dplyr::select",
+    "text": "Common functions - dplyr::select\nThe select function enables you to select a subset of the columns in your dataset\n\n\n\n\n# library(tidyverse) # if not already loaded\n# library(penguins) # if not already loaded\npenguins %&gt;%\n  select(species, island, bill_length_mm) %&gt;%\n  head(3)\n\n\n# A tibble: 3 × 3\n  species island    bill_length_mm\n  &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;\n1 Adelie  Torgersen           39.1\n2 Adelie  Torgersen           39.5\n3 Adelie  Torgersen           40.3\n\n\n\n\n\n\n\n\n# there is also ends_with\npenguins %&gt;%\n  select(starts_with(\"bill\")) %&gt;%\n  head(3)\n\n\n# A tibble: 3 × 2\n  bill_length_mm bill_depth_mm\n           &lt;dbl&gt;         &lt;dbl&gt;\n1           39.1          18.7\n2           39.5          17.4\n3           40.3          18  \n\n\n\n\n\n\n\n\npenguins %&gt;%\n  select(matches(\"mm\")) %&gt;%\n  head(3)\n\n\n# A tibble: 3 × 3\n  bill_length_mm bill_depth_mm flipper_length_mm\n           &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;\n1           39.1          18.7               181\n2           39.5          17.4               186\n3           40.3          18                 195"
+  },
+  {
+    "objectID": "slides.html#common-functions---dplyrfilter",
+    "href": "slides.html#common-functions---dplyrfilter",
+    "title": "Intro to research toolbox",
+    "section": "Common functions - dplyr::filter",
+    "text": "Common functions - dplyr::filter\nThe filter function enables you to select a subset of the rows that meet a certain criteria\n\n\npenguins %&gt;%\n  filter(body_mass_g &gt; 3500) %&gt;%\n  head(3)\n\n\n\n# A tibble: 3 × 8\n  species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g\n  &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;\n1 Adelie  Torgersen           39.1          18.7               181        3750\n2 Adelie  Torgersen           39.5          17.4               186        3800\n3 Adelie  Torgersen           39.3          20.6               190        3650\n# ℹ 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;\n\n\n\n\n\npenguins %&gt;% filter(sex == \"female\")\n\n\n\n# A tibble: 165 × 8\n   species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g\n   &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;\n 1 Adelie  Torgersen           39.5          17.4               186        3800\n 2 Adelie  Torgersen           40.3          18                 195        3250\n 3 Adelie  Torgersen           36.7          19.3               193        3450\n 4 Adelie  Torgersen           38.9          17.8               181        3625\n 5 Adelie  Torgersen           41.1          17.6               182        3200\n 6 Adelie  Torgersen           36.6          17.8               185        3700\n 7 Adelie  Torgersen           38.7          19                 195        3450\n 8 Adelie  Torgersen           34.4          18.4               184        3325\n 9 Adelie  Biscoe              37.8          18.3               174        3400\n10 Adelie  Biscoe              35.9          19.2               189        3800\n# ℹ 155 more rows\n# ℹ 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;"
+  },
+  {
+    "objectID": "slides.html#common-functions---dplyrmutate",
+    "href": "slides.html#common-functions---dplyrmutate",
+    "title": "Intro to research toolbox",
+    "section": "Common functions - dplyr::mutate",
+    "text": "Common functions - dplyr::mutate\nThe mutate function enables you to add columns to your dataset. The added columns can be derived from existing column(s)\n\n\npenguins %&gt;%\n  mutate(body_mass_100g = body_mass_g / 100) %&gt;%\n  select(body_mass_g, body_mass_100g) %&gt;%\n  head(5)\n\n\n\n# A tibble: 5 × 2\n  body_mass_g body_mass_100g\n        &lt;int&gt;          &lt;dbl&gt;\n1        3750           37.5\n2        3800           38  \n3        3250           32.5\n4          NA           NA  \n5        3450           34.5\n\n\n\n\n\npenguins %&gt;%\n  mutate(bill_length_plus_depth_mm = bill_length_mm + bill_depth_mm) %&gt;%\n  select(matches(\"bill\")) %&gt;%\n  head(5)\n\n\n\n# A tibble: 5 × 3\n  bill_length_mm bill_depth_mm bill_length_plus_depth_mm\n           &lt;dbl&gt;         &lt;dbl&gt;                     &lt;dbl&gt;\n1           39.1          18.7                      57.8\n2           39.5          17.4                      56.9\n3           40.3          18                        58.3\n4           NA            NA                        NA  \n5           36.7          19.3                      56"
+  },
+  {
+    "objectID": "slides.html#common-functions---dplyrgroup_by-summarise",
+    "href": "slides.html#common-functions---dplyrgroup_by-summarise",
+    "title": "Intro to research toolbox",
+    "section": "Common functions - dplyr::group_by, summarise",
+    "text": "Common functions - dplyr::group_by, summarise\n\n\nThe summarise function enables you to get summary statistics like N, mean, median etc\n\npenguins %&gt;% summarise(N = n(),\n                       mean_body_mass_g = mean(body_mass_g))\n\n\n\n# A tibble: 1 × 2\n      N mean_body_mass_g\n  &lt;int&gt;            &lt;dbl&gt;\n1   344               NA\n\n\nThe group_by function enables you to get summary statistics within groups\n\npenguins %&gt;%\n  group_by(sex) %&gt;%\n  summarise(N = n(),\n            mean_body_mass_g = mean(body_mass_g),\n            median_body_mass_g = median(body_mass_g))\n\n\n\n# A tibble: 3 × 4\n  sex        N mean_body_mass_g median_body_mass_g\n  &lt;fct&gt;  &lt;int&gt;            &lt;dbl&gt;              &lt;dbl&gt;\n1 female   165            3862.               3650\n2 male     168            4546.               4300\n3 &lt;NA&gt;      11              NA                  NA"
+  },
+  {
+    "objectID": "slides.html#common-functions---dplyrarrange",
+    "href": "slides.html#common-functions---dplyrarrange",
+    "title": "Intro to research toolbox",
+    "section": "Common functions - dplyr::arrange",
+    "text": "Common functions - dplyr::arrange\nThe function arrange enables us to sort by a certain variable\n\npenguins %&gt;%\n  group_by(sex, year) %&gt;%\n  summarise(mean_body_mass_g = mean(body_mass_g)) %&gt;%\n  arrange(desc(year))\n\n\n\n# A tibble: 9 × 3\n# Groups:   sex [3]\n  sex     year mean_body_mass_g\n  &lt;fct&gt;  &lt;int&gt;            &lt;dbl&gt;\n1 female  2009            3874.\n2 male    2009            4521.\n3 &lt;NA&gt;    2009              NA \n4 female  2008            3888.\n5 male    2008            4632.\n6 &lt;NA&gt;    2008            4650 \n7 female  2007            3821.\n8 male    2007            4479.\n9 &lt;NA&gt;    2007              NA"
+  },
+  {
+    "objectID": "slides.html#common-functions---dplyrif_else-case_when",
+    "href": "slides.html#common-functions---dplyrif_else-case_when",
+    "title": "Intro to research toolbox",
+    "section": "Common functions - dplyr::if_else, case_when",
+    "text": "Common functions - dplyr::if_else, case_when\nThe functions if_else and case_when are often used with mutate to create new variables\n\n\nset.seed(2)\npenguins %&gt;%\n  mutate(bill_length_type = if_else(bill_length_mm &gt;= 48.5, \"long bill\", \"short bill\")) %&gt;%\n  sample_n(4)\n\n\n\n# A tibble: 4 × 9\n  species   island bill_length_mm bill_depth_mm flipper_length_mm body_mass_g\n  &lt;fct&gt;     &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;\n1 Chinstrap Dream            43.5          18.1               202        3400\n2 Gentoo    Biscoe           43.6          13.9               217        4900\n3 Gentoo    Biscoe           48.1          15.1               209        5500\n4 Gentoo    Biscoe           46.8          14.3               215        4850\n# ℹ 3 more variables: sex &lt;fct&gt;, year &lt;int&gt;, bill_length_type &lt;chr&gt;\n\n\n\n\n\npenguins %&gt;%\n  mutate(bill_length_type = case_when(bill_length_mm &gt;= 48.5 ~ \"long bill\",\n                                      bill_length_mm &lt; 48.5 ~ \"short bill\",\n                                      TRUE ~ NA_character_)) %&gt;%\n  select(bill_length_type) %&gt;%\n  table(useNA = \"ifany\")\n\n\n\nbill_length_type\n long bill short bill       &lt;NA&gt; \n        87        255          2"
+  },
+  {
+    "objectID": "slides.html#common-functions---forcatsfct_relevel",
+    "href": "slides.html#common-functions---forcatsfct_relevel",
+    "title": "Intro to research toolbox",
+    "section": "Common functions - forcats::fct_relevel",
+    "text": "Common functions - forcats::fct_relevel"
+  },
+  {
+    "objectID": "slides.html#common-functions---forcatsfct_collapse",
+    "href": "slides.html#common-functions---forcatsfct_collapse",
+    "title": "Intro to research toolbox",
+    "section": "Common functions - forcats::fct_collapse",
+    "text": "Common functions - forcats::fct_collapse"
+  },
+  {
+    "objectID": "slides.html#common-functions---stringrstr_detect",
+    "href": "slides.html#common-functions---stringrstr_detect",
+    "title": "Intro to research toolbox",
+    "section": "Common functions - stringr::str_detect",
+    "text": "Common functions - stringr::str_detect"
+  },
+  {
+    "objectID": "slides.html#common-functions---dplyrpivot_wider-longer",
+    "href": "slides.html#common-functions---dplyrpivot_wider-longer",
+    "title": "Intro to research toolbox",
+    "section": "Common functions - dplyr::pivot_wider & longer",
+    "text": "Common functions - dplyr::pivot_wider & longer"
+  },
+  {
+    "objectID": "slides.html#common-functions---dplyrbind_rows-bind_cols",
+    "href": "slides.html#common-functions---dplyrbind_rows-bind_cols",
+    "title": "Intro to research toolbox",
+    "section": "Common functions - dplyr::bind_rows, bind_cols",
+    "text": "Common functions - dplyr::bind_rows, bind_cols"
+  },
+  {
+    "objectID": "slides.html#common-functions---dplyrmutate-across",
+    "href": "slides.html#common-functions---dplyrmutate-across",
+    "title": "Intro to research toolbox",
+    "section": "Common functions - dplyr::mutate + across",
+    "text": "Common functions - dplyr::mutate + across"
+  },
+  {
+    "objectID": "slides.html#histograms",
+    "href": "slides.html#histograms",
+    "title": "Intro to research toolbox",
+    "section": "Histograms",
+    "text": "Histograms\n\npenguins %&gt;%\n  ggplot(aes(x = flipper_length_mm, fill = species)) + geom_histogram(bins = 40)"
+  },
+  {
+    "objectID": "slides.html#facet-wrap",
+    "href": "slides.html#facet-wrap",
+    "title": "Intro to research toolbox",
+    "section": "Facet wrap",
+    "text": "Facet wrap\n\npenguins %&gt;%\n  ggplot(aes(x = flipper_length_mm, fill = sex)) +\n    geom_histogram() +\n    facet_wrap(~species, dir = \"v\", scale = \"free_y\")"
+  },
+  {
+    "objectID": "slides.html#analysis-bivariate-tests-for-independent-observations",
+    "href": "slides.html#analysis-bivariate-tests-for-independent-observations",
+    "title": "Intro to research toolbox",
+    "section": "Analysis: Bivariate tests for independent observations",
+    "text": "Analysis: Bivariate tests for independent observations\n\n\n\n\n\n\n\n\nVariable 1\nVariable 2\nBivariate test\n\n\n\n\nCategorical\nCategorical\n1. Chi-square test  2. Fisher’s exact test\n\n\nCategorical\nContinuous\nParametric:  1. Independent t-test (2 categories)  2. One-way independent ANOVA (&gt;2 categories)\n\n\nCategorical\nContinuous\nNon-parametric:  1. Mann-Whitney test (2 categories) a.k.a. Wilcoxon rank-sum test  2. Kruskal-Wallis test (&gt;2 categories)\n\n\nContinuous\nContinuous\nParametric: Pearson’s correlation coefficient\n\n\nContinuous\nContinuous\nNon-parametric: Spearman’s correlation coefficient"
+  },
+  {
+    "objectID": "slides.html#analysis-bivariate-tests-for-repeated-measurements",
+    "href": "slides.html#analysis-bivariate-tests-for-repeated-measurements",
+    "title": "Intro to research toolbox",
+    "section": "Analysis: Bivariate tests for repeated measurements",
+    "text": "Analysis: Bivariate tests for repeated measurements\n\n\n\n\n\n\n\n\nVariable 1\nVariable 2\nBivariate test\n\n\n\n\nCategorical\nCategorical time  (e.g. baseline, 12-month)\nMcNemar’s test\n\n\nContinuous\nCategorical time  (e.g. baseline, 12-month)\nParametric: Dependent t-test\n\n\nContinuous\nCategorical time  (e.g. baseline, 12-month)\nNon-parametric: Wilcoxon signed-rank test"
+  },
+  {
+    "objectID": "slides.html#measures-of-central-tendency",
+    "href": "slides.html#measures-of-central-tendency",
+    "title": "Intro to research toolbox",
+    "section": "Measures of central tendency",
+    "text": "Measures of central tendency\n\nMean (SD), median (IQR) helps you get a sense of the distribution of characteristics in your study population with respect to levels of the outcome\nThe tableby function of the arsenal package lets you do this easily\nWe will talk about improving upon the formatting of the table in presenting tables\n\n\nlibrary(arsenal)\n\n1tableby(species ~ sex + island + bill_length_mm,\n        data = penguins,\n        control = tableby.control(numeric.stats = c(\"Nmiss\", \"meansd\", \"medianq1q3\", \"range\"))) %&gt;%\nsummary(text = TRUE) %&gt;%\nknitr::kable(align = c(\"l\", rep(\"r\", 5)))\n\n\n1\n\ntableby function invoked by these 3 lines\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nAdelie (N=152)\nChinstrap (N=68)\nGentoo (N=124)\nTotal (N=344)\np value\n\n\n\n\nsex\n\n\n\n\n0.976\n\n\n- N-Miss\n6\n0\n5\n11\n\n\n\n- female\n73 (50.0%)\n34 (50.0%)\n58 (48.7%)\n165 (49.5%)\n\n\n\n- male\n73 (50.0%)\n34 (50.0%)\n61 (51.3%)\n168 (50.5%)\n\n\n\nisland\n\n\n\n\n&lt; 0.001\n\n\n- Biscoe\n44 (28.9%)\n0 (0.0%)\n124 (100.0%)\n168 (48.8%)\n\n\n\n- Dream\n56 (36.8%)\n68 (100.0%)\n0 (0.0%)\n124 (36.0%)\n\n\n\n- Torgersen\n52 (34.2%)\n0 (0.0%)\n0 (0.0%)\n52 (15.1%)\n\n\n\nbill_length_mm\n\n\n\n\n&lt; 0.001\n\n\n- N-Miss\n1\n0\n1\n2\n\n\n\n- Mean (SD)\n38.791 (2.663)\n48.834 (3.339)\n47.505 (3.082)\n43.922 (5.460)\n\n\n\n- Median (Q1, Q3)\n38.800 (36.750, 40.750)\n49.550 (46.350, 51.075)\n47.300 (45.300, 49.550)\n44.450 (39.225, 48.500)\n\n\n\n- Range\n32.100 - 46.000\n40.900 - 58.000\n40.900 - 59.600\n32.100 - 59.600"
+  },
+  {
+    "objectID": "slides.html#measures-of-central-tendency-repeated-measures",
+    "href": "slides.html#measures-of-central-tendency-repeated-measures",
+    "title": "Intro to research toolbox",
+    "section": "Measures of central tendency (repeated measures)",
+    "text": "Measures of central tendency (repeated measures)\n\nThe paired function from arsenal package"
+  },
+  {
+    "objectID": "slides.html#how-are-categorical-variables-represented",
+    "href": "slides.html#how-are-categorical-variables-represented",
+    "title": "Intro to research toolbox",
+    "section": "How are categorical variables represented?",
+    "text": "How are categorical variables represented?\n\nCategorical variables are characters, but we need a numeric matrix in order to perform computations to get the \\(\\beta\\) coefficients\n\n\nset.seed(10)\nidx &lt;- sample(1:344, 5)\npenguins[idx,]\n\n# A tibble: 5 × 8\n  species   island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g\n  &lt;fct&gt;     &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;\n1 Adelie    Dream               35.6          17.5               191        3175\n2 Chinstrap Dream               50.7          19.7               203        4050\n3 Adelie    Torgersen           39.7          18.4               190        3900\n4 Gentoo    Biscoe              43.2          14.5               208        4450\n5 Gentoo    Biscoe              47.2          13.7               214        4925\n# ℹ 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;\n\n\n\nSo one-hot encoding / dummy encoding will be applied to categorical variables\n\n\nmodel.matrix(~species, penguins)[idx,]\n\n    (Intercept) speciesChinstrap speciesGentoo\n137           1                0             0\n330           1                1             0\n72            1                0             0\n211           1                0             1\n271           1                0             1"
+  },
+  {
+    "objectID": "slides.html#framework",
+    "href": "slides.html#framework",
+    "title": "Intro to research toolbox",
+    "section": "Framework",
+    "text": "Framework\n\n\n\n\n\nflowchart LR\n  A[Model specification] --&gt; B[Inference] --&gt; C[Diagnostics]\n\n\n\n\n\n\n\nModel specification\n\nHow to decide what type of model to fit?\nHow to decide what variables to choose?\n\nInference\n\nHow do we get the value of the coefficients, confidence intervals, p-values?\n\nDiagnostics\n\nDoes the model fit our data well?"
+  },
+  {
+    "objectID": "slides.html#why-the-need-for-glm",
+    "href": "slides.html#why-the-need-for-glm",
+    "title": "Intro to research toolbox",
+    "section": "Why the need for GLM?",
+    "text": "Why the need for GLM?\n\nWe want to find the association between an outcome (e.g. BMI) and some dependent variables (e.g. age, gender, ethnicity, social economic status)\nWe are used to fitting a multivariable linear regression \\[\n\\begin{align}\n  \\underbrace{BMI}_{\\text{continuous}} &= \\underbrace{\\beta_0 + \\beta_1age + \\beta_2gender + \\beta_3ethnicity + \\cdots + \\epsilon}_{\\text{this linear combination is continuous}} \\\\\n  \\epsilon &\\sim N(0, \\sigma^2)\n\\end{align}\n\\]\nWhat if your outcome is not continuous?\n\nE.g. outcome takes on values of 0 or 1 (logistic regression)\nE.g. outocme takes on discrete integer values 0, 1, 2, … (poisson regression)\n\nGLM gives you a way to relate the outome (which can take on various distributions) with a linear combination of dependent variables"
+  },
+  {
+    "objectID": "slides.html#formal-definition-of-glm",
+    "href": "slides.html#formal-definition-of-glm",
+    "title": "Intro to research toolbox",
+    "section": "Formal definition of GLM",
+    "text": "Formal definition of GLM\nGLM consists of 2 components. See notations below1\n\n\n\n\n\n\nComponent 1: What distribution does your outcome, \\(y_i\\) take on?\n\n\n\\[\\begin{align}\n    y_i|X_i \\sim \\text{member of exponential family} \\ \\text{(e.g. $y_i$ is normally distributed)}\n\\end{align}\\]\n\n\n\n\n\n\n\n\n\nComponent 2: What is the link function \\(g\\) you want to use?\n\n\n\\[\\begin{align}\n    g(\\mathbb{E}(y_i|X_i)) = X_i^{T} \\beta = \\underbrace{\\beta_0 + \\beta_1 age_i + \\beta_2 gender_i + \\beta_3 ethnicity_i + \\cdots}_{\\text{this linear combination is continuous}}\n\\end{align}\\]\n\n\\(g\\) is the link function that maps \\(\\mathbb{E}(y_i|x_i)\\) to \\(X_i^{T}\\beta\\)\nIt is the link function that enables the mapping of the continuous \\(X_i^{T}\\beta\\) to \\(y_i\\), which can be discrete for example\n\n\n\n\nNotation\n\nLet \\(i\\) index the \\(i\\)-th observation of your dataset i.e. corresponds to a particular row of your dataset\nLet \\(y_i\\) represent the \\(i\\)-th observation of your outcome variable\nLet \\(X_i\\) represent the \\(i\\)-th observation of all your independent variables (e.g. age, gender, ethnicity)"
+  },
+  {
+    "objectID": "slides.html#formal-definition-of-glm-1",
+    "href": "slides.html#formal-definition-of-glm-1",
+    "title": "Intro to research toolbox",
+    "section": "Formal definition of GLM",
+    "text": "Formal definition of GLM\n\nIn a generalised linear model, the outcome variable \\(y_1,...,y_n\\) are modelled as independent and identically distributed (iid) observations\nThe outcome variable is treated as a random variable (i.e. outcome takes on a certain distribution e.g. normal), but NOT the independent variables"
+  },
+  {
+    "objectID": "slides.html#family-member-1-linear-regression",
+    "href": "slides.html#family-member-1-linear-regression",
+    "title": "Intro to research toolbox",
+    "section": "Family member 1: Linear regression",
+    "text": "Family member 1: Linear regression\n\nWhen our outcome, \\(y_i\\) is continuous and takes on real values (i.e. \\(y_i \\in \\mathbb{R}\\)), we may choose to model \\(y_i\\) with a normal distribution\nComponent 1: \\(y_i|x_i\\) is normally distributed\n\n\\[\\begin{align*}\n    y_i | x_i \\sim \\mathcal{N}(X_i^{T}\\beta, \\sigma^2)\n\\end{align*}\\]\n\nComponent 2: link function is the identity function i.e. no transformation done\n\n\\[\\begin{align*}\n    \\mathbb{E}(y_i|x_i) = X_i^{T}\\beta = \\beta_0 + \\beta_1age_i + \\beta_2 gender_i + \\beta_3 ethnicity_i + \\cdots \\hspace{2mm}\n\\end{align*}\\]"
+  },
+  {
+    "objectID": "slides.html#running-a-linear-regression-in-r",
+    "href": "slides.html#running-a-linear-regression-in-r",
+    "title": "Intro to research toolbox",
+    "section": "Running a linear regression in R",
+    "text": "Running a linear regression in R\n\nNotice the use of the formula syntax. LHS of the ~ is the dependent variable, while RHS are the independent variables\nNotice the family argument contains the 2 components of the GLM we discussed earlier\n\n\n\nmodel &lt;- \n  glm(body_mass_g ~ species + bill_length_mm +\n                    bill_depth_mm + \n                    flipper_length_mm + sex,\n      data = penguins,\n      family = gaussian(link = \"identity\"))\n\nsummary(model)\n\n\n\nCall:\nglm(formula = body_mass_g ~ species + bill_length_mm + bill_depth_mm + \n    flipper_length_mm + sex, family = gaussian(link = \"identity\"), \n    data = penguins)\n\nCoefficients:\n                   Estimate Std. Error t value Pr(&gt;|t|)    \n(Intercept)       -1460.995    571.308  -2.557 0.011002 *  \nspeciesChinstrap   -251.477     81.079  -3.102 0.002093 ** \nspeciesGentoo      1014.627    129.561   7.831 6.85e-14 ***\nbill_length_mm       18.204      7.106   2.562 0.010864 *  \nbill_depth_mm        67.218     19.742   3.405 0.000745 ***\nflipper_length_mm    15.950      2.910   5.482 8.44e-08 ***\nsexmale             389.892     47.848   8.148 7.97e-15 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n(Dispersion parameter for gaussian family taken to be 82563.33)\n\n    Null deviance: 215259666  on 332  degrees of freedom\nResidual deviance:  26915647  on 326  degrees of freedom\n  (11 observations deleted due to missingness)\nAIC: 4723.9\n\nNumber of Fisher Scoring iterations: 2"
+  },
+  {
+    "objectID": "slides.html#family-member-2-logistic-regression",
+    "href": "slides.html#family-member-2-logistic-regression",
+    "title": "Intro to research toolbox",
+    "section": "Family member 2: Logistic regression",
+    "text": "Family member 2: Logistic regression\n\nWhen our outcome, \\(y_i\\), is discrete and dichotomous (i.e. take two discrete values, 0-1, success-failure), we can model \\(y_i\\) with a Bernoulli distribution\nComponent 1: \\(y_i|x_i\\) is Bernoulli distributed\n\n\\(y_i | x_i \\sim \\mathrm{Bernoulli}(\\pi_i)\\)\n\\(\\pi_i\\) is the probability of success of \\(y_i\\)\n\\(\\mathbb{E}(y_i|x_i) = \\pi_i\\)\n\nComponent 2: Link function, \\(g\\), is the logit function\n\n\\[\\begin{align*}\n    g(\\mathbb{E}(y_i|x_i)) &= \\underbrace{\\mathrm{ln} \\left( \\frac{\\mathbb{E}(y_i|x_i)}{1-\\mathbb{E}(y_i|x_i)} \\right)}_{logit[\\mathbb{E}(y_i|x_i)]} = X_i^{T}\\beta = \\underbrace{\\beta_0 + \\beta_1 age_i + \\beta_2 gender_i + \\beta_3 ethnicity_i + \\cdots}_{\\text{this linear combination is continuous}}\n\\end{align*}\\]"
+  },
+  {
+    "objectID": "slides.html#running-a-logistic-regression-in-r",
+    "href": "slides.html#running-a-logistic-regression-in-r",
+    "title": "Intro to research toolbox",
+    "section": "Running a logistic regression in R",
+    "text": "Running a logistic regression in R\n\nTo be filled only after completion of exercise\nCode is largely similar to linear regression except for:\n\nfamily = binomial(link = \"logit\")"
+  },
+  {
+    "objectID": "slides.html#inference",
+    "href": "slides.html#inference",
+    "title": "Intro to research toolbox",
+    "section": "Inference",
+    "text": "Inference\n\nMaximum likelihood estimation is the way to derive the beta coefficients"
+  },
+  {
+    "objectID": "slides.html#interpretation-what-do-the-coefficients-mean",
+    "href": "slides.html#interpretation-what-do-the-coefficients-mean",
+    "title": "Intro to research toolbox",
+    "section": "Interpretation: What do the coefficients mean?",
+    "text": "Interpretation: What do the coefficients mean?"
+  },
+  {
+    "objectID": "slides.html#family-member-3-conway-maxell-poisson-cmp-regression",
+    "href": "slides.html#family-member-3-conway-maxell-poisson-cmp-regression",
+    "title": "Intro to research toolbox",
+    "section": "Family member 3: Conway-Maxell-Poisson (CMP) regression",
+    "text": "Family member 3: Conway-Maxell-Poisson (CMP) regression\n\nWhen our outcome variable is a “count”, the poisson regression model is used because the poisson distribution models counts better than say linear regression which assumes that the outcome variable is normally distributed\nHowever, the poisson regression model is restrictive as it assumes equi-dispersion in our outcome variable (i.e. mean of outcome variable approximately equals the variance of the outcome variable) When there is under- or over-dispersion, the poisson distribution no longer models the outcome variable well.\nWhen there is over-dispersion (variance of outcome &gt; mean of outcome), negative binomial regression is often used\nWhen there is under-dispersion (i.e. variance of outcome &lt; mean of outcome), we will use the Conway-Maxwell-Poisson regression model\nUseful resources: (i) Video explanations see1,2 (ii) Sellers & Premeaux3 explains the CMP regression and surveys available statistical packages"
+  },
+  {
+    "objectID": "slides.html#cmp-distribution",
+    "href": "slides.html#cmp-distribution",
+    "title": "Intro to research toolbox",
+    "section": "CMP distribution",
+    "text": "CMP distribution\n\n\nThe Conway-Maxwell-Poisson distribution differs from the Poisson distribution with the introduction of a parameter \\(\\nu\\)\nThe \\(\\nu\\) parameter enables the Conway-Maxwell-Poisson distribution to model a wide range of dispersion, and generalises well-known distributions\n\nWhen \\(\\nu = 1\\), it takes on the Poisson distribution (equi-dispersion)\nWhen \\(\\nu = 0\\) and \\(\\lambda &lt; 1\\), it takes on the geometric distribution (over-dispersion)\nWhen \\(\\nu \\rightarrow \\infty\\), it takes on the bernoulli distribution (under-dispersion)"
+  },
+  {
+    "objectID": "slides.html#cmp-regression",
+    "href": "slides.html#cmp-regression",
+    "title": "Intro to research toolbox",
+    "section": "CMP regression",
+    "text": "CMP regression\n\nUse of the Conway-Maxwell-Poisson (CMP) distribution in the generalised linear model (GLM) setting:\n\nIn the original CMP formulation of Sellers and Shmueli4, the relationship between dependent variable \\(Y\\) and independent variables \\(X\\) is given by the equations:\n\n\\(ln(\\lambda_{i}) = X_{i}^T\\beta\\)\n\\(\\mathbb{E}(Y_{i}) = \\lambda_{i} \\frac{\\partial ln Z(lambda_{i}, \\nu)}{\\partial \\lambda_i} \\approx \\lambda_{i}^{\\frac{1}{\\nu}} - \\frac{\\nu - 1}{2\\nu}\\), where \\(Z(\\lambda_i, \\nu_i)\\) is a normalizing constant\n\n\nHowever, the CMP regression model is not amenable to interpretation of coefficients by mean contrasts, because \\(\\lambda_i\\) is related to \\(\\mathbb{E}(Y_i)\\) by a non-linear function\nTo overcome this, Huang 20175 reparameterised the CMP distribution to model the mean directly. He called it CMP\\(\\mu\\)"
+  },
+  {
+    "objectID": "slides.html#cmpmu-regression",
+    "href": "slides.html#cmpmu-regression",
+    "title": "Intro to research toolbox",
+    "section": "CMP\\(\\mu\\)-regression",
+    "text": "CMP\\(\\mu\\)-regression\n\nUnder the CMP\\(\\mu\\)-regression formulation, the relationship between dependent variable \\(Y\\) and independent variables \\(X\\) is given by \\(ln(\\mathbb{E}(Y_i|X)) = X_{i}^T\\beta\\)\nThe convenient thing about CMP-regression and CMP\\(\\mu\\)-regression is that we can conduct a likelihood ratio test4,5 to see if a poisson regression model (poisson regression is a special case of CMP-regression when \\(\\nu = 1\\)) is adequate (i.e. \\(H_0: \\nu = 1\\) vs \\(H_1: \\nu \\ne 1\\))\nNote that \\(H_1\\) does not specify the direction (under vs over) of data dispersion. This can be assessed via the dispersion estimate \\(\\hat{\\nu}\\)4 (i.e. \\(\\hat{\\nu} &gt; 1\\) if under-dispersion and \\(\\hat{\\nu} &lt; 1\\) if over-dispersion)\nModel diagnostics5: If the underlying distributional model is correct, the probability inverse transformation (PIT) should resemble a random sample from a standard uniform distribution. Goodness-of-fit can then be assessed by plotting a histogram of the PIT, or via a quantile plot of the PIT against the uniform distribution"
+  },
+  {
+    "objectID": "slides.html#running-a-cmpmu-regression-in-r",
+    "href": "slides.html#running-a-cmpmu-regression-in-r",
+    "title": "Intro to research toolbox",
+    "section": "Running a CMP\\(\\mu\\)-regression in R",
+    "text": "Running a CMP\\(\\mu\\)-regression in R\nWe will use the mpcmp6 R package’s implementation of the CMP\\(\\mu\\)-regression"
+  },
+  {
+    "objectID": "slides.html#what-is-the-kappa-statistic",
+    "href": "slides.html#what-is-the-kappa-statistic",
+    "title": "Intro to research toolbox",
+    "section": "What is the Kappa statistic?",
+    "text": "What is the Kappa statistic?\n\nThe Kappa statistic is a measure of “true” agreement. It indicates the proportion of agreement beyond that expected by chance7\nIf prevalence index is high, chance agreement will be higher, kappa is reduced\nIf bias index is high, chance agreement will be lower, kappa is higher"
+  },
+  {
+    "objectID": "slides.html#calculation-of-kappa-statistic",
+    "href": "slides.html#calculation-of-kappa-statistic",
+    "title": "Intro to research toolbox",
+    "section": "Calculation of Kappa statistic",
+    "text": "Calculation of Kappa statistic\n\nCalculation of prevalence-adjusted, bias-adjusted Kappa can be done through the epiR package"
+  },
+  {
+    "objectID": "slides.html#background",
+    "href": "slides.html#background",
+    "title": "Intro to research toolbox",
+    "section": "Background",
+    "text": "Background\n\n\nConfounding bias"
+  },
+  {
+    "objectID": "slides.html#purpose-of-propensity-score-matching",
+    "href": "slides.html#purpose-of-propensity-score-matching",
+    "title": "Intro to research toolbox",
+    "section": "Purpose of propensity score matching",
+    "text": "Purpose of propensity score matching\n\nOne of the methods to deal with confounding bias in retrospective observational study\nCompare the effectiveness of different treatment options8\nCompare the effectiveness of a health intervention programme vs usual care group9"
+  },
+  {
+    "objectID": "slides.html#how-do-we-choose-matching-variables",
+    "href": "slides.html#how-do-we-choose-matching-variables",
+    "title": "Intro to research toolbox",
+    "section": "How do we choose matching variables?",
+    "text": "How do we choose matching variables?"
+  },
+  {
+    "objectID": "slides.html#markdown",
+    "href": "slides.html#markdown",
+    "title": "Intro to research toolbox",
+    "section": "Markdown",
+    "text": "Markdown\n\nMarkdown is a lightweight markup language that you can use to add formatting elements to plaintext text documents. Created by John Gruber in 2004, Markdown is now one of the world’s most popular markup languages.1\nTry out the markdown live preview\n\nFrom Markdown Guide"
+  },
+  {
+    "objectID": "slides.html#r-markdown",
+    "href": "slides.html#r-markdown",
+    "title": "Intro to research toolbox",
+    "section": "R Markdown",
+    "text": "R Markdown\n\nR Markdown is an extension to markdown that enables user to execute R code and display the code output in addition to text\nThe knitr application enables us to execute R code and display output in a temporary markdown document\nPandoc then converts the markdown document to the desired format (e.g. html, pdf, docx, pptx)\nSee summary by Robin Linacre\n\n\nImage from R Markdown cookbook chapter 2.1"
+  },
+  {
+    "objectID": "slides.html#demo-creation-of-an-r-markdown-document",
+    "href": "slides.html#demo-creation-of-an-r-markdown-document",
+    "title": "Intro to research toolbox",
+    "section": "[DEMO] Creation of an R markdown document",
+    "text": "[DEMO] Creation of an R markdown document\n\nCreate an rmarkdown document\n\nKnit your document into html"
+  },
+  {
+    "objectID": "slides.html#components-of-rmarkdown-document",
+    "href": "slides.html#components-of-rmarkdown-document",
+    "title": "Intro to research toolbox",
+    "section": "Components of Rmarkdown document",
+    "text": "Components of Rmarkdown document\n\nYAML header: controls the meta data e.g. Title, date, output document format, table of contents\nFormatted text of your descriptions, explanations etc.\nCode chunks: where you run R code e.g. plot graphs and display the output in the same document\n\n\n\n\n\n\n\nImage taken from An Introduction to R"
+  },
+  {
+    "objectID": "slides.html#r-markdown-yaml-header",
+    "href": "slides.html#r-markdown-yaml-header",
+    "title": "Intro to research toolbox",
+    "section": "R markdown YAML header",
+    "text": "R markdown YAML header\n\n---\ntitle: \"My project\"\nauthor: \"CRU\"\ndate: '`r format(Sys.Date(), \"%d %b %Y\")`'\noutput: \n  bookdown::html_document2:\n    toc: true\n    toc_float: true\nbibliography: references.bib\ncsl: vancouver-superscript.csl \nlink-citations: true\n---\n\n\nThis is a common setting which I use\nbookdown::html_document2 of the Bookdown package is a good output format because it takes care of formatting e.g. auto-numbering of sections, handling of references, appendix\ntoc (line 7 & 8) refers to table of contents\nbibliography, csl and link-citations is for adding citations stored in a bibtex file into your document. More will be covered in a later slide"
+  },
+  {
+    "objectID": "slides.html#consort-diagram",
+    "href": "slides.html#consort-diagram",
+    "title": "Intro to research toolbox",
+    "section": "Consort diagram",
+    "text": "Consort diagram\n\nThe consort package provides a convenient consort_plot function to plot CONSORT diagrams for reporting inclusion/exclusion/allocation (see the vignette)\n\nlibrary(consort)\nflow_diagram &lt;- consort_plot(data = penguins %&gt;%\n                                      mutate(id = row_number(),\n                                             exclusion = case_when(island == \"Dream\" ~ \"Penguins on Dream island\",\n                                                                   year == 2007 ~ \"Data collected in 2007\",\n                                                                   TRUE ~ NA_character_) %&gt;%\n                                                         fct_relevel(\"Penguins on Dream island\",\n                                                                     \"Data collected in 2007\")),\n                             orders = c(id = \"Study population\",\n                                        exclusion = \"Excluded\",\n                                        id = \"Data for analysis\"),\n                                        side_box = \"exclusion\",\n                             cex = 1.2)\nplot(flow_diagram)\n\n\n\n\n\n\n\n\nFor presenting in html documents, the plot function does not render the plot fully so when that happens, save it as an image first\n\n# Change the file path to where you want your image to be saved\nggsave(here(\"images/consort_diagram.png\"), plot = build_grid(flow_diagram))\n\nNext, load your image using knitr::include_graphics\n\n# You can use the fig.height or fig.width chunk option to rescale your image\nknitr::include_graphics(here(\"images/consort_diagram.png\"))"
+  },
+  {
+    "objectID": "slides.html#pres_table",
+    "href": "slides.html#pres_table",
+    "title": "Intro to research toolbox",
+    "section": "Presenting tables",
+    "text": "Presenting tables\n\npacman::p_load(arsenal, knitr)\n\ntableby(species ~ sex + island + bill_length_mm,\n        data = penguins,\n        control = tableby.control(numeric.stats = c(\"Nmiss\", \"meansd\", \"medianq1q3\", \"range\"))) %&gt;%\nsummary(text = TRUE) %&gt;%\n1knitr::kable(align = c(\"l\", rep(\"r\", 5)))\n\n\n1\n\nThe kable function converts the table object to html\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nAdelie (N=152)\nChinstrap (N=68)\nGentoo (N=124)\nTotal (N=344)\np value\n\n\n\n\nsex\n\n\n\n\n0.976\n\n\n- N-Miss\n6\n0\n5\n11\n\n\n\n- female\n73 (50.0%)\n34 (50.0%)\n58 (48.7%)\n165 (49.5%)\n\n\n\n- male\n73 (50.0%)\n34 (50.0%)\n61 (51.3%)\n168 (50.5%)\n\n\n\nisland\n\n\n\n\n&lt; 0.001\n\n\n- Biscoe\n44 (28.9%)\n0 (0.0%)\n124 (100.0%)\n168 (48.8%)\n\n\n\n- Dream\n56 (36.8%)\n68 (100.0%)\n0 (0.0%)\n124 (36.0%)\n\n\n\n- Torgersen\n52 (34.2%)\n0 (0.0%)\n0 (0.0%)\n52 (15.1%)\n\n\n\nbill_length_mm\n\n\n\n\n&lt; 0.001\n\n\n- N-Miss\n1\n0\n1\n2\n\n\n\n- Mean (SD)\n38.791 (2.663)\n48.834 (3.339)\n47.505 (3.082)\n43.922 (5.460)\n\n\n\n- Median (Q1, Q3)\n38.800 (36.750, 40.750)\n49.550 (46.350, 51.075)\n47.300 (45.300, 49.550)\n44.450 (39.225, 48.500)\n\n\n\n- Range\n32.100 - 46.000\n40.900 - 58.000\n40.900 - 59.600\n32.100 - 59.600"
+  },
+  {
+    "objectID": "slides.html#formatting-html-tables",
+    "href": "slides.html#formatting-html-tables",
+    "title": "Intro to research toolbox",
+    "section": "Formatting HTML tables",
+    "text": "Formatting HTML tables\nThe kableExtra package provides useful functions to format tables e.g. changing column width, changing colors, font size, fixed header rows etc.\n\npacman::p_load(arsenal, knitr, kableExtra)\n\ntableby(species ~ sex + island + bill_length_mm,\n        data = penguins,\n        control = tableby.control(numeric.stats = c(\"Nmiss\", \"meansd\", \"medianq1q3\", \"range\"))) %&gt;%\nsummary(text = TRUE) %&gt;%\nkable(align = c(\"l\", rep(\"r\", 5))) %&gt;%\nkableExtra::column_spec(column = 6, width_min = \"2.5cm\")\n\n\n\n\n\n\nAdelie (N=152)\nChinstrap (N=68)\nGentoo (N=124)\nTotal (N=344)\np value\n\n\n\n\nsex\n\n\n\n\n0.976\n\n\n- N-Miss\n6\n0\n5\n11\n\n\n\n- female\n73 (50.0%)\n34 (50.0%)\n58 (48.7%)\n165 (49.5%)\n\n\n\n- male\n73 (50.0%)\n34 (50.0%)\n61 (51.3%)\n168 (50.5%)\n\n\n\nisland\n\n\n\n\n&lt; 0.001\n\n\n- Biscoe\n44 (28.9%)\n0 (0.0%)\n124 (100.0%)\n168 (48.8%)\n\n\n\n- Dream\n56 (36.8%)\n68 (100.0%)\n0 (0.0%)\n124 (36.0%)\n\n\n\n- Torgersen\n52 (34.2%)\n0 (0.0%)\n0 (0.0%)\n52 (15.1%)\n\n\n\nbill_length_mm\n\n\n\n\n&lt; 0.001\n\n\n- N-Miss\n1\n0\n1\n2\n\n\n\n- Mean (SD)\n38.791 (2.663)\n48.834 (3.339)\n47.505 (3.082)\n43.922 (5.460)\n\n\n\n- Median (Q1, Q3)\n38.800 (36.750, 40.750)\n49.550 (46.350, 51.075)\n47.300 (45.300, 49.550)\n44.450 (39.225, 48.500)\n\n\n\n- Range\n32.100 - 46.000\n40.900 - 58.000\n40.900 - 59.600\n32.100 - 59.600"
+  },
+  {
+    "objectID": "slides.html#cross-references-citations",
+    "href": "slides.html#cross-references-citations",
+    "title": "Intro to research toolbox",
+    "section": "Cross-references & citations",
+    "text": "Cross-references & citations\n\nSee cross-references and citations on how to add internal cross-references and citations from a bibtex file\nSee bibliographies and citations on how to add a references and appendix section"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Docs",
+    "section": "",
+    "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites."
+  }
+]
