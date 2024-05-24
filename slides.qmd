@@ -1,0 +1,1120 @@
+---
+title: "Intro to research toolbox"
+author: Jeremy Lew
+date: last-modified
+date-format: long
+format:
+  revealjs:
+     slide-number: true
+     embed-resources: true
+execute:
+  echo: true
+bibliography: references.bib
+csl: vancouver-superscript.csl 
+---
+
+```{r setup, include=FALSE}
+pacman::p_load(tidyverse, magrittr, here, palmerpenguins)
+```
+
+## Topics
+
+1.  Introduction & learning plan
+2.  Getting comfortable with R
+3.  Programming fundamentals
+4.  Data cleaning
+5.  Data visualisation
+6.  Statistical analysis
+7.  Presentation of results
+
+
+# Introduction & learning plan
+
+## Motivation
+
+1.  Added tools to your toolbox
+2.  Transferrable skill
+3.  Learning how to program in 1 language helps you learn other languages
+4.  Leverage on open source tools/projects written by others
+
+## Learning plan {.smaller}
+
+1.  The topics in this deck mirror the workflow of a project
+
+```{mermaid}
+%%| echo: false
+%%| fig-width: 10
+
+flowchart LR
+  D[Data exported\nfrom REDCAP]-->C[Data cleaning]
+  C-->S[Statistical analysis]
+  S-->P[Presentation\nof results]
+```
+
+2.  The game plan is to first do a quick pass through from data cleaning to analysis:
+    i.  Take a toy dataset
+    ii. "Clean" the data (minimally)
+    iii. Run a regression model
+3.  Once we have gotten comfortable with R, we will explore each topic in greater detail
+    i.  [Data cleaning](#data_cleaning)
+    ii. [Programming fundamentals](#prog_funda)
+    iii. [Analysis: generalised linear models](#ana_glm)
+    iv. [Presentation of results](#presentation)
+
+## Resources
+
+1.  [R courses](https://pll.harvard.edu/subject/r){target="_blank"}
+2.  [The Epidemiologist R Handbook](https://epirhandbook.com/en/index.html){target="_blank"}
+3.  [R for Data Science](https://r4ds.had.co.nz/index.html){target="_blank"}
+4.  [Advanced R](https://adv-r.hadley.nz/){target="_blank"}
+5.  [Cheat Sheets](https://posit.co/resources/cheatsheets/){target="_blank"}
+
+# Getting comfortable with R
+
+## What is an R package? {.smaller}
+
+1.  It is a collection of code/data written by someone and packaged for distribution
+2.  Hosted on the [*Comprehensive R Archive Network*](https://CRAN.R-project.org/package=palmerpenguins){target="_blank"} and/or [*Github*](https://github.com/allisonhorst/palmerpenguins/){target="_blank"} for public download
+3.  From the CRAN webpage, we are able to find a reference manual documenting the data/functions of the package
+4.  From the Github repository, we are able to see the actual codes implemented by the package's author(s)
+5.  To install a package we would run `install.packages("palmerpenguins")` in the console
+6.  To load a package, we would run `library(palmerpenguins)`
+7.  To uninstall a package we would run `remove.packages("palmerpenguins")` in the console
+
+
+## \[DEMO\] Intro to RStudio workspace {.smaller}
+
+1.  Console: where you run/execute lines of code
+1.  To assign a variable, we use the `<-` operator
+    ```{r}
+    x <- 1:10; print(x)
+    ```
+    i. random-access memory is allocated when a variable is assigned/declared
+    i. random-access memory is freed-up when the variable is deleted (or garbage collected if it goes out of scope)
+1.  Environment: where you're able to see variables stored in random-access memory
+    i.  To clear variables from environment $\rightarrow$ execute `rm(list = ls())` in console
+
+## \[DEMO\] Intro to RStudio workspace {.smaller}
+
+1.  Script
+    i. Writing code and saving the script
+    i. Execute single/multiple lines of code $\rightarrow$ highlight code + Ctrl-enter
+    i. Runs from top to bottom
+    i. Comments will not be executed
+1.  Hotkeys
+    i. Clear the console $\rightarrow$ Ctrl-l
+    i. Clear a line in console $\rightarrow$ Ctrl-d
+
+
+## \[PRACTISE\] Tasks to do {.smaller}
+
+1.  For this task, you will need the `palmerpenguins` and `tidyverse` packages. Install them if you have not already done so
+2.  We will make use of the `penguins` dataset from `palmerpenguins` package
+3.  Understand the data
+4.  Dichotomise `body_mass_g` (continuous) into a categorical variable with 2 categories ("light": \<= 4750g and "heavy": \> 4750g)
+5.  Run a linear regression[^1] with `body_mass_g` as the dependent variable and independent variables: `species`, `bill_length_mm`, `bill_depth_mm`, `flipper_length_mm` and `sex`
+6.  Run a logistic regression with the categorical body mass variable you created earlier as the dependent variable, with the same independent variables as before
+
+[^1]: Note: the model is for learning purpose. No clever reason for choosing the variables
+
+
+
+
+# Programming Fundamentals {#prog_funda}
+
+## Data types {.smaller}
+
+::: {.incremental}
+1.  Character data type e.g. `"a"`
+    ```{r}
+    #| output-location: column-fragment
+    typeof("a")
+    ```
+2.  Integer data type e.g. `1L`
+    ```{r}
+    #| output-location: column-fragment
+    typeof(1L)
+    ```
+3.  Numeric data type e.g. `5.0`
+
+    ```{r}
+    #| output-location: column
+    typeof(5.0)
+    ```
+4.  Logical data type e.g. `TRUE` or `FALSE`
+    ```{r}
+    #| output-location: column
+    typeof(TRUE)
+    ```
+5.  Complex data type e.g. `1 + 4i`
+    ```{r}
+    #| output-location: column
+    typeof(1 + 4i)
+    ```
+:::
+
+## Data types (continued) {.smaller}
+1.  Factor datatype for working with categorical variables
+    ```{r}
+    x <- factor(sample(c("Malay", "Others", "Indian", "Chinese"), 10, replace = T),
+                levels = c("Chinese", "Malay", "Indian", "Others"))
+    print(x)
+    ```
+    ```{r}
+    print(levels(x))
+    ```
+
+1. A factor variable is more useful than a plain character vector. 
+E.g. the first level will be used by `glm` as the reference category
+
+
+
+
+## Data structures (vectors) {.smaller}
+
+::: {.incremental}
+1. Data structures are *containers* for holding data
+1.  A character vector holds multiple characters
+    ```{r}
+    #| output-location: column
+    letters
+    ```
+    ```{r}
+    #| output-location: column
+    typeof(letters)
+    ```
+1.  A numeric vector holds multiple numbers
+    ```{r}
+    #| output-location: column
+    x <- 1:5; print(x)
+    ```
+    ```{r}
+    #| output-location: column
+    typeof(x)
+    ```
+:::
+
+. . . 
+
+::: callout-note
+## Exercise
+::: {.incremental}
+1. Can you query the length of your character vector? `length(letters)`
+1. Can you slice the character vector to get the first 5 elements? `letters[1:5]`
+1. Can you slice the character vector to get the 1st, 9th, 20th elements? `letters[c(1, 9, 20)]`
+1. Can you flip the character vector from last to first element? `letters[length(letters):1]`
+:::
+:::
+
+
+## Data structures (lists) {.smaller}
+1. Vectors can only hold 1 kind of data type e.g. characters, numeric etc
+1. Lists are “containers” that can hold multiple data types
+    1. Unnamed lists
+       ```{r}
+       list("a", 1, 10:15)
+       ```
+    1. Named lists
+       ```{r}
+       list(a = "a", b = 1, c = 10:15)
+       ```
+
+## Data structures (lists, continued)
+
+::: callout-note
+## Exercise
+
+1. Create a variable in your console: `mylist <- list(a = "a", b = 1, c = 10:15)`
+1. Can you query the length of mylist? `length(mylist)`
+1. Can you get the second element of your mylist using
+    1. index: `mylist[1]`
+    1. key: `mylist$a` or `mylist[["a"]]`
+1. Compare the difference between `mylist[3]` and `mylist[[3]]`
+1. Compare the difference between `class(mylist[3])` and `class(mylist[[3]])`
+:::
+
+## Data structures (dataframe) {.smaller}
+
+::: incremental
+1. Dataframe is a *tabular container* that can hold multiple data types like lists, but each column can only store data of the same data type
+1.  To view the first 2 rows of the `penguins` dataset from the `palmerpenguins` package
+
+    ```{r}
+    #| output-location: fragment
+    #| code-line-numbers: "|3"
+    library(tidyverse)
+    library(palmerpenguins)
+    penguins %>% head(2)
+    ```
+
+2.  To view the last 2 rows of the dataset
+
+    ```{r}
+    #| output-location: fragment
+    penguins %>% tail(2)
+    ```
+
+3.  To view the data in rstudio, execute `view(penguins)`
+:::
+
+## Data structures (dataframe, continued)
+
+::: callout-note
+
+## Exercise
+1. Can you query the dimensions of the `penguins` dataset using `dim(penguins)`, `ncol(penguins)`, `nrow(penguins)`?
+1. Can you get a glimpse of the data using the functions `glimpse(penguins)`?
+1. Can you view summary statistics of the data using `summary(penguins)`?
+:::
+
+## Data structures (dataframe, accessing variables) {.smaller}
+
+1.  To get the column/variable-names of your dataset
+    ```{r}
+    colnames(penguins)
+    ```
+1.  To access any column variable, we use the `$` syntax
+    ```{r}
+    penguins$species[1:10]
+    ```
+1.  To get a table count of a variable or a cross-table count of 2 variables
+    ```{r}
+    table(penguins$sex, useNA = "ifany")
+    ```
+1. See [Data Cleaning](#data_cleaning) for more ways to work with dataframes
+
+
+## Data structures (dataframe, loading data) {.smaller}
+
+1. To import data from csv file, use `read_csv`
+1. To import data from an excel file, use `read_excel`  
+1. To import data from SAS/SPSS/Stata or export from R to these file formats,
+use the [`haven`](https://haven.tidyverse.org/){target="_blank"} package
+
+
+## Data structures (dataframe, adding labels) {.smaller}
+
+1. To add labels to a dataframe, we make use of the [`labelled`](https://cran.r-project.org/web/packages/labelled/vignettes/intro_labelled.html){target="_blank"} package
+
+
+
+## Functions {.smaller}
+
+1. A good chapter on explaining functions is [Chapter 6, Advanced R](https://adv-r.hadley.nz/functions.html){target="_blank"}, where most of the examples in the slides are taken
+1.  Example function
+    ```{r}
+    f01 <- function(x, y) {
+      # A comment
+      x + y
+    }
+    ```
+1. Components of a function
+    a. *Arguments* $\rightarrow$ inputs to the function (there can also be functions with no arguments)
+    a. *Body* $\rightarrow$ the code inside the function
+    a. *Environment* $\rightarrow$ a list-like structure that stores/maps the variable name to value (a namespace as some people call it)
+1. Functions are objects that can be assigned or they can be anonymous functions
+
+## Function invocation {.smaller}
+1.  How do we invoke the function?
+    ```{r}
+    print(f01)
+    f01(3, 5)
+    ```
+
+1. How do we invoke one function after another?
+    a. Suppose we have another function `f02`
+       ```{r}
+       f02 <- function(a, b) {
+         a * 10 + b
+       }
+       ```
+    b. To call `f01` first followed by `f02` and `sqrt` we will "nest" the functions (inside-out, right to left)
+       ```{r}
+       sqrt(f02(f01(1, 2), 5))
+       ```
+
+## Function invocation (continued) {.smaller}    
+
+Another way to invoke a series of functions is to use the *pipe* operator `%>%` provided by the `magrittr` package
+```{r}
+library(magrittr)
+value <- 1
+value %>%
+  f01(2) %>%
+  f02(5) %>%
+  sqrt()
+```
+    
+::: callout-note
+## Exercise
+1. What is the difference between `f02` and `f02(1, 2)`?
+:::
+
+## Function output
+1. What is returned by a function? The last evaluated expression
+
+1. How do we store values outputted from a function? With assignment statment
+
+1. Early termination of a function with a return statement
+
+## Functions - argument passing {.smaller}
+
+1. Pass by copy vs pass by reference
+1. In R, all functions are pass by reference if you don't modify the object subsequently within the function.
+i.e. copy-on-modify
+1.  How to pass arguments?
+    ```{r}
+    f04 <- function(x, y, z) {
+      (x / y) * z
+    }
+    ```
+    a. By position e.g. `f04(10, 50, 20)`
+    b. By name e.g. `f04(z = 20, y = 50, x = 10)`
+    c. Unpacking multiple named arguments using `do.call`
+       ```{r}
+       do.call(f04, list(x = 10, y = 50, z = 20))
+       ```
+
+## Functions - lexical scoping, name masking 
+
+Names defined inside a function mask names defined outside a function
+
+```{r}
+x <- 10
+y <- 20
+f05 <- function() {
+  x <- 1
+  y <- 2
+  c(x, y)
+}
+
+f05()
+```
+
+## Functions - lexical scoping, looking one level up
+R will look up a variable in the enclosing scope (e.g. within the function) and if it's not found,
+will continue to proceed upwards (e.g. enclosing function or global environment) to look for
+the variable until it is found 
+```{r}
+x <- 1
+f06 <- function() {
+  y <- 2
+  i <- function() {
+    z <- 3
+    c(x, y, z)
+  }
+  i()
+}
+
+f06()
+```
+
+::: callout-note
+## Exercise
+Using the sample function, change the z variable inside the function and observe that...
+```{r}
+z <- 10
+f07 <- function(x, y) {
+  # make your edit here
+  z <- z * 100
+  z + x + y
+}
+```
+...there is no change to the z variable outside the function in the global environment
+:::
+
+## Functions - lexical scoping, dynamic lookup 
+
+R looks for the values when the function is run, not when the function is created
+```{r}
+z <- 10
+f08 <- function(x, y) {
+  z + x + y
+}
+
+z <- 100
+f08(5, 10)
+```
+
+## Functions
+
+## Loops
+
+## Debugging
+
+## Memory Management
+
+
+# Data Cleaning {#data_cleaning}
+
+## Common functions - packages
+
+1.  These functions are from various packages, conveniently collected in the [tidyverse](https://www.tidyverse.org/){target="_blank"} package
+2.  The best package for data wrangling is [dplyr](https://dplyr.tidyverse.org/){target="_blank"}. Useful info can be found in this [chapter](https://r4ds.had.co.nz/transform.html){target="_blank"}
+3.  A package for working with dates is [lubridate](https://lubridate.tidyverse.org/){target="_blank"}
+4.  A package for working with strings is [stringr](https://stringr.tidyverse.org/){target="_blank"}. This is useful for cleaning free-text response data
+5.  A package for working with factor datatype is [forcats](https://forcats.tidyverse.org/){target="_blank"}
+
+
+## Common functions - dplyr::select {.smaller}
+
+The [`select`](https://dplyr.tidyverse.org/reference/select.html){target="_blank"} function enables you to select a subset of the columns in your dataset
+
+. . .
+
+<br>
+
+```{r}
+#| output-location: column-fragment
+#| code-line-numbers: "|4"
+# library(tidyverse) # if not already loaded
+# library(penguins) # if not already loaded
+penguins %>%
+  select(species, island, bill_length_mm) %>%
+  head(3)
+```
+
+. . .
+
+<br>
+
+```{r}
+#| output-location: column-fragment
+#| code-line-numbers: "|3"
+# there is also ends_with
+penguins %>%
+  select(starts_with("bill")) %>%
+  head(3)
+```
+
+. . .
+
+<br>
+
+```{r}
+#| output-location: column-fragment
+#| code-line-numbers: "|2"
+penguins %>%
+  select(matches("mm")) %>%
+  head(3)
+```
+
+## Common functions - dplyr::filter {.smaller}
+
+The [`filter`](https://dplyr.tidyverse.org/reference/filter.html){target="_blank"} function enables you to select a subset of the rows that meet a certain criteria
+
+. . .
+
+```{r}
+#| output-location: fragment
+#| code-line-numbers: "|2"
+penguins %>%
+  filter(body_mass_g > 3500) %>%
+  head(3)
+```
+
+. . .
+
+```{r}
+#| output-location: fragment
+penguins %>% filter(sex == "female")
+```
+
+## Common functions - dplyr::mutate {.smaller}
+
+The [`mutate`](https://dplyr.tidyverse.org/reference/mutate.html){target="_blank"} function enables you to add columns to your dataset. The added columns can be derived from existing column(s)
+
+. . .
+
+```{r}
+#| output-location: fragment
+#| code-line-numbers: "|2"
+penguins %>%
+  mutate(body_mass_100g = body_mass_g / 100) %>%
+  select(body_mass_g, body_mass_100g) %>%
+  head(5)
+```
+
+. . .
+
+```{r}
+#| output-location: fragment
+#| code-line-numbers: "|2"
+penguins %>%
+  mutate(bill_length_plus_depth_mm = bill_length_mm + bill_depth_mm) %>%
+  select(matches("bill")) %>%
+  head(5)
+```
+
+## Common functions - dplyr::group_by, summarise {.smaller}
+
+::: incremental
+1.  The [`summarise`](https://dplyr.tidyverse.org/reference/summarise.html){target="_blank"} function enables you to get summary statistics like N, mean, median etc
+
+    ```{r}
+    #| output-location: fragment
+    penguins %>% summarise(N = n(),
+                           mean_body_mass_g = mean(body_mass_g))
+    ```
+
+2.  The [`group_by`](https://dplyr.tidyverse.org/reference/group_by.html){target="_blank"} function enables you to get summary statistics within groups
+
+    ```{r}
+    #| output-location: fragment
+    #| code-line-numbers: "|2"
+    penguins %>%
+      group_by(sex) %>%
+      summarise(N = n(),
+                mean_body_mass_g = mean(body_mass_g),
+                median_body_mass_g = median(body_mass_g))
+    ```
+:::
+
+## Common functions - dplyr::arrange
+
+The function [`arrange`](https://dplyr.tidyverse.org/reference/arrange.html){target="_blank"} enables us to sort by a certain variable
+
+```{r}
+#| output-location: fragment
+#| code-line-numbers: "|4"
+penguins %>%
+  group_by(sex, year) %>%
+  summarise(mean_body_mass_g = mean(body_mass_g)) %>%
+  arrange(desc(year))
+```
+
+## Common functions - dplyr::if_else, case_when {.smaller}
+
+The functions [`if_else`](https://dplyr.tidyverse.org/reference/if_else.html#arguments){target="_blank"} and [`case_when`](https://dplyr.tidyverse.org/reference/case_when.html){target="_blank"} are often used with mutate to create new variables
+
+. . .
+
+```{r}
+#| output-location: fragment
+#| code-line-number: "|3"
+set.seed(2)
+penguins %>%
+  mutate(bill_length_type = if_else(bill_length_mm >= 48.5, "long bill", "short bill")) %>%
+  sample_n(4)
+```
+
+. . .
+
+```{r}
+#| output-location: fragment
+penguins %>%
+  mutate(bill_length_type = case_when(bill_length_mm >= 48.5 ~ "long bill",
+                                      bill_length_mm < 48.5 ~ "short bill",
+                                      TRUE ~ NA_character_)) %>%
+  select(bill_length_type) %>%
+  table(useNA = "ifany")
+```
+
+## Common functions - forcats::fct_relevel
+
+## Common functions - forcats::fct_collapse
+
+## Common functions - stringr::str_detect
+
+## Common functions - dplyr::pivot_wider & longer
+
+## Common functions - dplyr::bind_rows, bind_cols 
+
+## Common functions - dplyr::mutate + across
+
+
+# Data visualisation
+
+The [ggplot2](https://ggplot2.tidyverse.org/){target="_blank"} package is well known for plotting figures
+
+## Histograms
+
+```{r}
+penguins %>%
+  ggplot(aes(x = flipper_length_mm, fill = species)) + geom_histogram(bins = 40)
+```
+
+## Facet wrap
+
+```{r}
+penguins %>%
+  ggplot(aes(x = flipper_length_mm, fill = sex)) +
+    geom_histogram() +
+    facet_wrap(~species, dir = "v", scale = "free_y")
+```
+
+
+
+
+# Analysis: Descriptive statistics
+
+## Analysis: Bivariate tests for independent observations {.smaller .scrollable}
+
+| Variable 1  | Variable 2  | Bivariate test                                                                                          |
+| ----------- | ----------- | ------------------------------------------------------------------------------------------------------- |
+| Categorical | Categorical | 1. Chi-square test <br> 2. Fisher's exact test                                                          |
+| Categorical | Continuous  | Parametric: <br> 1. Independent t-test (2 categories) <br> 2. One-way independent ANOVA (>2 categories) |
+| Categorical | Continuous  | Non-parametric: <br> 1. Mann-Whitney test (2 categories) a.k.a. Wilcoxon rank-sum test <br> 2. Kruskal-Wallis test (>2 categories) |
+| Continuous  | Continuous  | Parametric: Pearson's correlation coefficient                                                           |
+| Continuous  | Continuous  | Non-parametric: Spearman's correlation coefficient                                                      |
+
+: {tbl-colwidths="[25,25,50]"}
+
+## Analysis: Bivariate tests for repeated measurements {.smaller .scrollable}
+
+| Variable 1  | Variable 2  | Bivariate test                                                               |
+| ----------- | ----------- | ---------------------------------------------------------------------------- |
+| Categorical | Categorical time <br> (e.g. baseline, 12-month) | McNemar's test                            |
+| Continuous  | Categorical time <br> (e.g. baseline, 12-month) | Parametric: Dependent t-test              |
+| Continuous  | Categorical time <br> (e.g. baseline, 12-month) | Non-parametric: Wilcoxon signed-rank test |
+
+: {tbl-colwidths="[25,37.5,37.5]"}
+
+
+## Measures of central tendency {.smaller .scrollable}
+
+1. Mean (SD), median (IQR) helps you get a sense of the distribution of characteristics in your study population with respect to levels of the outcome
+1. The [`tableby` function](https://cran.r-project.org/web/packages/arsenal/vignettes/tableby.html){target="_blank"} of the [`arsenal`](https://mayoverse.github.io/arsenal/){target="_blank"} package lets you do this easily
+1. We will talk about improving upon the formatting of the table in [presenting tables](#pres_table)
+
+```{r}
+#| code-line-numbers: "|3,4,5"
+library(arsenal)
+
+tableby(species ~ sex + island + bill_length_mm,                                                        # <1>
+        data = penguins,                                                                                # <1>
+        control = tableby.control(numeric.stats = c("Nmiss", "meansd", "medianq1q3", "range"))) %>%     # <1>
+summary(text = TRUE) %>%
+knitr::kable(align = c("l", rep("r", 5)))
+```
+
+1. `tableby` function invoked by these 3 lines
+
+
+## Measures of central tendency (repeated measures) {.smaller .scrollable}
+
+1. The [`paired` function](https://cran.r-project.org/web/packages/arsenal/vignettes/paired.html){target="_blank"} from [`arsenal`](https://mayoverse.github.io/arsenal/){target="_blank"} package
+
+
+
+
+# Analysis: Generalised Linear Models (GLM) {#ana_glm}
+
+## How are categorical variables represented? {.smaller}
+
+1. Categorical variables are characters, but we need a numeric matrix in order to perform computations to get the $\beta$ coefficients
+```{r}
+set.seed(10)
+idx <- sample(1:344, 5)
+penguins[idx,]
+```
+
+1. So one-hot encoding / dummy encoding will be applied to categorical variables
+```{r}
+model.matrix(~species, penguins)[idx,]
+```
+
+
+## Framework {.smaller}
+
+```{mermaid}
+%%| echo: false
+%%| fig-width: 9
+
+flowchart LR
+  A[Model specification] --> B[Inference] --> C[Diagnostics]
+```
+
+1.  Model specification
+    a.  How to decide what type of model to fit?
+    b.  How to decide what variables to choose?
+2.  Inference
+    a.  How do we get the value of the coefficients, confidence intervals, p-values?
+3.  Diagnostics
+    a.  Does the model fit our data well?
+
+<!-- ```{=html} -->
+<!-- ## Model specification
+
+1.  Look at the literature
+2.  Form an idea of a causal diagram
+3.  Check for multicollinearity -->
+<!-- ``` -->
+
+
+## Why the need for GLM? {.smaller}
+
+1.  We want to find the association between an outcome (e.g. BMI) and some dependent variables (e.g. age, gender, ethnicity, social economic status)
+2.  We are used to fitting a multivariable linear regression $$
+    \begin{align}
+      \underbrace{BMI}_{\text{continuous}} &= \underbrace{\beta_0 + \beta_1age + \beta_2gender + \beta_3ethnicity + \cdots + \epsilon}_{\text{this linear combination is continuous}} \\
+      \epsilon &\sim N(0, \sigma^2)
+    \end{align}
+    $$
+3.  What if your outcome is not continuous?
+    i.  E.g. outcome takes on values of 0 or 1 (logistic regression)
+    ii. E.g. outocme takes on discrete integer values 0, 1, 2, ... (poisson regression)
+4.  GLM gives you a way to relate the outome (which can take on various distributions) with a linear combination of dependent variables
+
+## Formal definition of GLM {.smaller}
+
+GLM consists of 2 components. See notations below[^2]
+
+[^2]: Notation
+
+    i.  Let $i$ index the $i$-th observation of your dataset i.e. corresponds to a particular row of your dataset
+
+    ii. Let $y_i$ represent the $i$-th observation of your outcome variable
+
+    iii. Let $X_i$ represent the $i$-th observation of all your independent variables (e.g. age, gender, ethnicity)
+
+::: callout-tip
+# Component 1: What **distribution** does your outcome, $y_i$ take on?
+
+```{=tex}
+\begin{align}
+    y_i|X_i \sim \text{member of exponential family} \ \text{(e.g. $y_i$ is normally distributed)}
+\end{align}
+```
+:::
+
+::: callout-tip
+# Component 2: What is the **link function** $g$ you want to use?
+
+```{=tex}
+\begin{align}
+    g(\mathbb{E}(y_i|X_i)) = X_i^{T} \beta = \underbrace{\beta_0 + \beta_1 age_i + \beta_2 gender_i + \beta_3 ethnicity_i + \cdots}_{\text{this linear combination is continuous}}
+\end{align}
+```
+1.  $g$ is the link function that maps $\mathbb{E}(y_i|x_i)$ to $X_i^{T}\beta$
+2.  It is the link function that enables the mapping of the continuous $X_i^{T}\beta$ to $y_i$, which can be discrete for example
+:::
+
+## Formal definition of GLM
+
+2.  In a generalised linear model, the outcome variable $y_1,...,y_n$ are modelled as independent and identically distributed (iid) observations
+3.  The outcome variable is treated as a random variable (i.e. outcome takes on a certain distribution e.g. normal), but NOT the independent variables
+
+## Family member 1: Linear regression {.smaller}
+
+1.  When our outcome, $y_i$ is continuous and takes on real values (i.e. $y_i \in \mathbb{R}$), we may choose to model $y_i$ with a normal distribution
+2.  Component 1: $y_i|x_i$ is normally distributed
+
+```{=tex}
+\begin{align*}
+    y_i | x_i \sim \mathcal{N}(X_i^{T}\beta, \sigma^2)
+\end{align*}
+```
+3.  Component 2: link function is the identity function i.e. no transformation done
+
+```{=tex}
+\begin{align*}
+    \mathbb{E}(y_i|x_i) = X_i^{T}\beta = \beta_0 + \beta_1age_i + \beta_2 gender_i + \beta_3 ethnicity_i + \cdots \hspace{2mm} 
+\end{align*}
+```
+
+------------------------------------------------------------------------
+
+## Running a linear regression in R {.smaller}
+
+1.  Notice the use of the formula syntax. LHS of the `~` is the dependent variable, while RHS are the independent variables
+2.  Notice the `family` argument contains the 2 components of the GLM we discussed earlier
+
+```{r}
+#| output-location: column-fragment
+#| code-line-numbers: "|2|6|8"
+model <- 
+  glm(body_mass_g ~ species + bill_length_mm +
+                    bill_depth_mm + 
+                    flipper_length_mm + sex,
+      data = penguins,
+      family = gaussian(link = "identity"))
+
+summary(model)
+```
+
+------------------------------------------------------------------------
+
+## Family member 2: Logistic regression {.smaller}
+
+1.  When our outcome, $y_i$, is discrete and dichotomous (i.e. take two discrete values, 0-1, success-failure), we can model $y_i$ with a Bernoulli distribution
+2.  Component 1: $y_i|x_i$ is Bernoulli distributed
+    i.  $y_i | x_i \sim \mathrm{Bernoulli}(\pi_i)$
+    ii. $\pi_i$ is the probability of success of $y_i$
+    iii. $\mathbb{E}(y_i|x_i) = \pi_i$
+3.  Component 2: Link function, $g$, is the logit function
+
+```{=tex}
+\begin{align*}
+    g(\mathbb{E}(y_i|x_i)) &= \underbrace{\mathrm{ln} \left( \frac{\mathbb{E}(y_i|x_i)}{1-\mathbb{E}(y_i|x_i)} \right)}_{logit[\mathbb{E}(y_i|x_i)]} = X_i^{T}\beta = \underbrace{\beta_0 + \beta_1 age_i + \beta_2 gender_i + \beta_3 ethnicity_i + \cdots}_{\text{this linear combination is continuous}} 
+\end{align*}
+```
+
+------------------------------------------------------------------------
+
+## Running a logistic regression in R
+
+1.  To be filled only after completion of exercise
+2.  Code is largely similar to linear regression except for:
+    i.  `family = binomial(link = "logit")`
+
+## Inference
+
+1.  *Maximum likelihood estimation* is the way to derive the beta coefficients
+
+## Interpretation: What do the coefficients mean?
+
+
+## Family member 3: Conway-Maxell-Poisson (CMP) regression {.smaller}
+
+1. When our outcome variable is a "count", the poisson regression model is used because the poisson distribution models counts better than say
+linear regression which assumes that the outcome variable is normally distributed
+1. However, the poisson regression model is restrictive as it assumes equi-dispersion in our outcome variable (i.e. mean of outcome variable approximately equals the variance of the outcome variable)
+When there is under- or over-dispersion, the poisson distribution no longer models the outcome variable well.
+1. When there is over-dispersion (variance of outcome > mean of outcome), negative binomial regression is often used
+1. When there is under-dispersion (i.e. variance of outcome < mean of outcome), we will use the Conway-Maxwell-Poisson regression model
+1. Useful resources: (i) Video explanations see [@videolectureschannelFlexibleModelCount2012;@consortiumObservationDrivenConwayMaxwell2018] (ii) Sellers & Premeaux [@sellersConwayMaxwellPoisson2020] explains the CMP regression and surveys available statistical packages
+
+## CMP distribution {.smaller}
+
+<!-- 1. Background info on the Conway-Maxwell-Poisson (CMP) distribution: -->
+1. The Conway-Maxwell-Poisson distribution differs from the Poisson distribution with the introduction of a parameter $\nu$
+1. The $\nu$ parameter enables the Conway-Maxwell-Poisson distribution to model a wide range of dispersion, and generalises well-known distributions
+    a. When $\nu = 1$, it takes on the Poisson distribution (equi-dispersion)
+    a. When $\nu = 0$ and $\lambda < 1$, it takes on the geometric distribution (over-dispersion)
+    a. When $\nu \rightarrow \infty$, it takes on the bernoulli distribution (under-dispersion)
+
+## CMP regression {.smaller}
+1. Use of the Conway-Maxwell-Poisson (CMP) distribution in the generalised linear model (GLM) setting:
+    i. In the original CMP formulation of Sellers and Shmueli[@sellersFlexibleRegressionModel2010], the relationship between
+       dependent variable $Y$ and independent variables $X$ is given by the equations:
+        a. $ln(\lambda_{i}) = X_{i}^T\beta$
+        a. $\mathbb{E}(Y_{i}) = \lambda_{i} \frac{\partial ln Z(lambda_{i}, \nu)}{\partial \lambda_i} \approx \lambda_{i}^{\frac{1}{\nu}} - \frac{\nu - 1}{2\nu}$,
+           where $Z(\lambda_i, \nu_i)$ is a normalizing constant
+1. However, the CMP regression model is not amenable to interpretation of coefficients by mean contrasts, because $\lambda_i$ is related to $\mathbb{E}(Y_i)$ by a non-linear function
+1. To overcome this, Huang 2017[@huangMeanparametrizedConwayMaxwell2017] reparameterised the CMP distribution to model the mean directly. He called it CMP~$\mu$~
+
+## CMP~$\mu$~-regression {.smaller}
+
+1. Under the CMP~$\mu$~-regression formulation, the relationship between dependent variable $Y$ and independent variables $X$ is given by $ln(\mathbb{E}(Y_i|X)) = X_{i}^T\beta$
+1. The convenient thing about CMP-regression and CMP~$\mu$~-regression is that we can conduct a likelihood ratio test[@sellersFlexibleRegressionModel2010;@huangMeanparametrizedConwayMaxwell2017]
+   to see if a poisson regression model (poisson regression is a special case of CMP-regression when $\nu = 1$) is adequate (i.e. $H_0: \nu = 1$ vs $H_1: \nu \ne 1$) 
+1. Note that $H_1$ does not specify the direction (under vs over) of data dispersion. This can be assessed via the dispersion estimate $\hat{\nu}$[@sellersFlexibleRegressionModel2010]
+   (i.e. $\hat{\nu} > 1$ if under-dispersion and $\hat{\nu} < 1$ if over-dispersion)
+1. Model diagnostics[@huangMeanparametrizedConwayMaxwell2017]: If the underlying distributional model is correct, the probability inverse transformation (PIT) should resemble
+   a random sample from a standard uniform distribution. Goodness-of-fit can then be assessed by plotting a histogram of the PIT, or via a quantile plot of the PIT against
+   the uniform distribution
+    
+## Running a CMP~$\mu$~-regression in R
+
+We will use the [mpcmp](https://thomas-fung.github.io/mpcmp/){target="_blank"}[@fungMpcmpMeanParametriziedConwayMaxwell2020] R package's implementation of the CMP~$\mu$~-regression
+
+
+
+
+# Analysis: Concordance
+
+## What is the Kappa statistic?
+
+1.  The Kappa statistic is a measure of "true" agreement. It indicates the proportion of agreement beyond that expected by chance [@simKappaStatisticReliability2005]
+2.  If prevalence index is high, chance agreement will be higher, kappa is reduced
+3.  If bias index is high, chance agreement will be lower, kappa is higher
+
+## Calculation of Kappa statistic
+
+1.  Calculation of prevalence-adjusted, bias-adjusted Kappa can be done through the [`epiR`](https://cran.r-project.org/web/packages/epiR/index.html){target="_blank"} package
+
+<!-- ## Sample size calculation -->
+
+
+# Analysis: Comparative effectiveness research
+
+## Background
+
+1. 
+1. Confounding bias
+
+## Purpose of propensity score matching
+
+1. One of the methods to deal with confounding bias in retrospective observational study
+1. Compare the effectiveness of different treatment options [@jaksaUsingPrimaryCare2022]
+1. Compare the effectiveness of a health intervention programme vs usual care group [@luImpactLongitudinalVirtual2021]
+
+## How do we choose matching variables?
+
+```{=html}
+<!-- ## Gaps
+
+1.  How to relate "predictors" with outcome and how outcome links to other outcome
+2.  outcome complexity/adherence
+3.  other outcome: quality of life, cost of care, number of visits
+4.   -->
+```
+
+# Analysis: Intervention effect estimation
+
+1. 
+
+## 
+
+
+# Presentation of results {#presentation}
+
+## Markdown
+
+1. Markdown is a lightweight markup language that you can use to add formatting elements to plaintext text documents. Created by John Gruber in 2004, Markdown is now one of the world’s most popular markup languages.[^3]
+1. Try out the [markdown live preview](https://markdownlivepreview.com/){target="_blank"}
+
+[^3]: From [Markdown Guide](https://www.markdownguide.org/getting-started/){target="_blank"}
+
+
+## R Markdown {.smaller}
+
+1. R Markdown is an extension to markdown that enables user to execute R code and display the code output in addition to text
+1. The [knitr](https://yihui.org/knitr/){target="_blank"} application enables us to execute R code and display output in a temporary markdown document
+1. [Pandoc](https://pandoc.org/){target="_blank"} then converts the markdown document to the desired format (e.g. html, pdf, docx, pptx)
+1. See summary by [Robin Linacre](https://stackoverflow.com/questions/40563479/relationship-between-r-markdown-knitr-pandoc-and-bookdown){target="_blank"}
+
+```{r}
+#| echo: false
+#| out-width: "40%" 
+#| fig-cap: Image from [R Markdown cookbook chapter 2.1](https://bookdown.org/yihui/rmarkdown-cookbook/rmarkdown-process.html){target="_blank"}
+#| fig-align: left
+knitr::include_graphics(here("images/rmarkdown_knitr_process.png"))
+```
+
+
+## [DEMO] Creation of an R markdown document {.smaller .scrollable}
+
+1.  Create an rmarkdown document
+
+    ![](images/create_rmarkdown.gif){width="70%"}
+
+1.  Knit your document into html
+
+    ![](images/knit_rmarkdown.gif){width="70%"}
+
+
+## Components of Rmarkdown document {.smaller .scrollable}
+
+1. YAML header: controls the meta data e.g. Title, date, output document format, table of contents
+1. Formatted text of your descriptions, explanations etc.
+1. Code chunks: where you run R code e.g. plot graphs and display the output in the same document
+
+::: {style="text-align:center;"}
+```{r}
+#| echo: false
+#| out-height: "120%"
+#| out-width: "120%" 
+#| fig-cap: Image taken from [An Introduction to R](https://intro2r.com/r-markdown-anatomy.html){target="_blank"}
+#| fig-align: "center" 
+knitr::include_graphics(here("images/rmd_anatomy.png"))
+```
+:::
+
+
+## R markdown YAML header {.smaller}
+
+```{r}
+#| echo: true
+#| eval: false
+---
+title: "My project"
+author: "CRU"
+date: '`r format(Sys.Date(), "%d %b %Y")`'
+output: 
+  bookdown::html_document2:
+    toc: true
+    toc_float: true
+bibliography: references.bib
+csl: vancouver-superscript.csl 
+link-citations: true
+---
+```
+
+1. This is a common setting which I use 
+1. [bookdown::html_document2](https://bookdown.org/yihui/bookdown/a-single-document.html){target="_blank"} of the [Bookdown](https://pkgs.rstudio.com/bookdown/){target="_blank"} package is a good output format because it takes care of formatting e.g. auto-numbering of sections, handling of references, appendix
+1. toc (line 7 & 8) refers to table of contents
+1. bibliography, csl and link-citations is for adding citations stored in a bibtex file into your document. More will be covered in a later slide
+
+
+## Consort diagram {.smaller .scrollable}
+
+1.  The [`consort`](https://cran.r-project.org/web/packages/consort/index.html) package provides a convenient `consort_plot` function to plot CONSORT diagrams for reporting inclusion/exclusion/allocation (see the [vignette](https://cran.r-project.org/web/packages/consort/vignettes/consort_diagram.html))
+
+    ```{r}
+    #| out-height: "100%"
+    #| out-width: "120%"
+    library(consort)
+    flow_diagram <- consort_plot(data = penguins %>%
+                                          mutate(id = row_number(),
+                                                 exclusion = case_when(island == "Dream" ~ "Penguins on Dream island",
+                                                                       year == 2007 ~ "Data collected in 2007",
+                                                                       TRUE ~ NA_character_) %>%
+                                                             fct_relevel("Penguins on Dream island",
+                                                                         "Data collected in 2007")),
+                                 orders = c(id = "Study population",
+                                            exclusion = "Excluded",
+                                            id = "Data for analysis"),
+                                            side_box = "exclusion",
+                                 cex = 1.2)
+    plot(flow_diagram)
+    ```
+
+1.  For presenting in html documents, the plot function does not render the plot fully so when that happens, save it as an image first
+
+    ```{r}
+    #| eval: false
+    # Change the file path to where you want your image to be saved
+    ggsave(here("images/consort_diagram.png"), plot = build_grid(flow_diagram))
+    ```
+
+1.  Next, load your image using `knitr::include_graphics`
+
+    ```{r, fig.height = 2}
+    #| eval: false
+    # You can use the fig.height or fig.width chunk option to rescale your image
+    knitr::include_graphics(here("images/consort_diagram.png"))
+    ```
+
+
+## Presenting tables {#pres_table .smaller .scrollable}
+
+```{r}
+#| code-line-numbers: "|7"
+pacman::p_load(arsenal, knitr)
+
+tableby(species ~ sex + island + bill_length_mm,
+        data = penguins,
+        control = tableby.control(numeric.stats = c("Nmiss", "meansd", "medianq1q3", "range"))) %>%
+summary(text = TRUE) %>%
+knitr::kable(align = c("l", rep("r", 5))) # <1>
+```
+
+1. The [`kable`](https://bookdown.org/yihui/rmarkdown-cookbook/kable.html){target="_blank"} function converts the table object to html
+
+
+## Formatting HTML tables {.smaller .scrollable}
+
+The [kableExtra](https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html){target="_blank"} package provides useful functions to format tables e.g. changing column width, changing colors, font size, fixed header rows etc.
+
+```{r}
+#| code-line-numbers: "|8"
+pacman::p_load(arsenal, knitr, kableExtra)
+
+tableby(species ~ sex + island + bill_length_mm,
+        data = penguins,
+        control = tableby.control(numeric.stats = c("Nmiss", "meansd", "medianq1q3", "range"))) %>%
+summary(text = TRUE) %>%
+kable(align = c("l", rep("r", 5))) %>%
+kableExtra::column_spec(column = 6, width_min = "2.5cm")
+```
+
+
+## Cross-references & citations
+
+1. See cross-references and citations on how to add internal cross-references and citations from a bibtex file
+1. See bibliographies and citations on how to add a references and appendix section
+
+
+# References {.smaller}
