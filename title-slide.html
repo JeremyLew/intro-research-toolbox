@@ -1,0 +1,22 @@
+<script src="https://code.iconify.design/2/2.2.1/iconify.min.js"></script>
+<section id="$idprefix$title-slide"$for(title-slide-attributes/pairs)$ $it.key$="$it.value$"$endfor$>
+  <h1 class="title">$title$</h1>
+$if(subtitle)$
+  <p class="subtitle">$subtitle$</p>
+$endif$
+$for(author)$
+  <p class="author">$author$</p>
+$endfor$
+$for(institute)$
+  <p class="institute">$institute$</p>
+$endfor$
+$if(date)$
+  <p class="date">$date$</p>
+$endif$
+
+<div class="slide-footer">
+  <a href="https://github.com/JeremyLew/intro-research-toolbox" target="_blank">
+    <span class="iconify" data-icon="mdi:github" data-inline="false"></span>
+  </a>
+</div>
+</section>

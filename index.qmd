@@ -5,8 +5,10 @@ date: last-modified
 date-format: long
 format:
   revealjs:
-     slide-number: true
-     embed-resources: true
+    slide-number: true
+    embed-resources: true
+    template-partials:
+      - title-slide.html
 execute:
   echo: true
 bibliography: references.bib
