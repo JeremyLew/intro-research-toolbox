@@ -960,6 +960,177 @@ We will use the [mpcmp](https://thomas-fung.github.io/mpcmp/){target="_blank"}[@
 ## 
 
 
+# Analysis: Missing data
+
+## Outline
+
+1. Why do we care about missing data?
+1. What are the types of missingness mechanisms?
+1. What are the implications of each missingness mechanism?
+1. Multiple imputation as a method for imputing missing data
+
+## Motivation: why do we care about missing data? {.smaller}
+
+1. Commonly used statistical models (e.g. GLM) require complete-cases $\rightarrow$ forced to discard data points
+1. Data is expensive to collect
+1. In throwing out data, you will face the problem of:
+    a. Efficiency: number of data points are reduced $\rightarrow$ lose statistical power
+    a. Bias: you might systematically exclude a population group and end up with a biased dataset
+    a. Both bias and efficiency will influence your final conclusion
+
+## Missingness mechanism
+
+1. A <ins>missingness mechanism</ins> refers to the underlying process which generated the missing data
+1. There are 3 missingness mechanisms
+    i. Missing completely at random (MCAR)
+    i. Missing at random (MAR)
+    i. Missing not at random (MNAR)
+
+## Framework for understanding missingness mechanism
+
+1. We will use the framework as laid out in Mohan & Pearl[@mohanGraphicalModelsProcessing2021]
+1. Reason: Clearest way to discriminate between MCAR, MAR, MNAR
+1. Prerequisite: This requires an understanding of the concept of d-separation in graphical models
+
+## Framework notation {.smaller .scrollable}
+
+Suppose we have data in the following format[@mohanGraphicalModelsProcessing2021]
+![](images/mohan_pearl_table2.png)
+
+::: {.columns}
+
+::: {.column width="25%"}
+![](images/mohan_pearl_figure1b.png){fig-align="center"}
+
+::: {.r-fit-text}
+- $A$: Age
+- $G$: Gender
+- $O$: Obesity \text{(partially observed)}
+- $O^*$: Obesity \text{(fully observed)}
+- $R_O$: Missing indicator
+:::
+:::
+
+::: {.column width="75%"}
+1. Fully observed variables are shaded (e.g. $A$, $G$)
+1. Partially observed variables (with missing data) are non-shaded (e.g. $O$)
+1. To model the missingness process, two variables are introduced:
+    i. $R_O$ - A binary {0, 1} masking variable that governs missingness
+    i. $O^*$ - A proxy variable for obesity that is fully observed
+    $$ O^* = f(R_O, O) = 
+        \begin{cases}
+            O  & \text{if } R_O = 0 \\
+            m  & \text{if } R_O = 1
+        \end{cases} $$
+:::
+:::
+
+## #1 Missing completely at random (MCAR) {.smaller .scrollable}
+
+::: {.columns}
+
+::: {.column width="25%"}
+![](images/mohan_pearl_figure1b.png){fig-align="center"}
+:::
+
+::: {.column width="75%"}
+1. We say that the missing obesity data is MCAR if the cause of missingness is independent of any other variable (There are no edges between $R_O$ and $G, A, O$)
+1. Examples of how Obesity could be MCAR:
+    i. Technical fault: eg. random connectivity downtime in the weighing machine that prevents the sending of patient’s weight to EMR
+    i. Workflow: patient forgets to take his/her weight after questionnaire (and we could not call the patient to get his/her weight after)
+:::
+:::
+
+### Implications of MCAR
+
+1. Complete-case analysis $\rightarrow$ <ins>unbiased</ins> dataset, though loss of statistical power due to fewer $N$
+1. Multiple imputation $\rightarrow$ <ins>unbiased</ins> dataset
+    i. Multiple imputation attempts to impute missing variables using a model of the partially observed variable ($Y$) on the observed variables ($X$)
+    i. Why unbiased? $R_O \perp\!\!\!\!\!\!\perp O$ implies that $P(O | A, G, R_O = 1) = P(O | A, G, R_O = 0)$
+    i. The distribution of missing obesity values (which we are trying to impute) is the same as the distribution of observed obesity values, given the other observed variables like age & gender
+    i. So we can estimate the missing obesity values using a logistic regression model
+
+## #2 Missing at random (MAR) {.smaller .scrollable}
+
+::: {.columns}
+
+::: {.column width="25%"}
+![](images/mohan_pearl_figure1c.png){fig-align="center"}
+:::
+
+::: {.column width="75%"}
+1. We say that the missing Obesity data is MAR if the cause of missingness is dependent on fully observed variable(s) eg. Age
+1. Conditional independence assertion:
+    i. Missingness, $R_O$, is conditionally independent of Obesity given Age i.e. $R_O \perp\!\!\!\!\!\!\perp O | A$
+    i. Or you can think of it as: missingness, $R_O$, is only dependent on Age
+1. Example of how Obesity could be MAR:
+    i. A lot of missing weight data among teenagers who were rebellious and did not report their weight
+:::
+:::
+
+### Implications of MAR
+
+1. Complete-case analysis $\rightarrow$ <ins>biased</ins> dataset 
+    i. Why biased? Data from teenage patients is excluded
+1. Multiple imputation $\rightarrow$ <ins>unbiased</ins> dataset
+    i. Why unbiased? Data from teenage patients is imputed and not excluded
+    i. The conditional independence assertion above implies that $P(O | A, G, R_O = 1) = P(O | A, G, R_O = 0)$
+    i. We can impute the missing data as the distribution of missing obesity values (which we are trying to impute) is the same as the distribution of observed obesity values, given the other observed variables like age & gender
+
+## #3 Missing not at random (MNAR) {.smaller .scrollable}
+
+::: {.columns}
+
+::: {.column width="25%"}
+![](images/mohan_pearl_figure1d.png){fig-align="center"}
+:::
+
+::: {.column width="75%"}
+1. We say that the missing Obesity data is MNAR if the cause of missingness is dependent on the Obesity variable itself
+1. Example of how Obesity could be MNAR:
+    i. A lot of missing weight data from obese patients who are embarrassed and did not disclose their weight 
+    i. In another setting, we often find that low/high income earners do not disclose their income
+:::
+:::
+
+### Implications of MNAR
+
+1. Complete case analysis $\rightarrow$ <ins>biased</ins> dataset
+    i. Why biased? Data from obese patients is excluded
+1. Multiple imputation $\rightarrow$ <ins>biased</ins> dataset
+    i. Why biased? The distribution of missing obesity values (which we are trying to impute) is different from the distribution of observed obesity values, given the other observed variables like age & gender i.e. $P(O | A, G, R_O = 1) \ne P(O | A, G, R_O = 0)$
+    i. Imputing missing weight data for obese patients using data from patients who are not obese $\rightarrow$ imputed weight tend to be lower than what it should actually be
+1. Imputation of missing data requires causal modelling of $R$ variables. No pure statistical method of imputation exists[@mohanGraphicalModelsProcessing2021]
+
+## Can these missingness mechanisms be tested for? {.smaller}
+
+1. MAR and MNAR cannot be tested for (see section 1.4 of Enders[@endersAppliedMissingData2022])
+    1. In each case, an independence assertion regarding the missing variable was made
+    1. Since the missing variable is by definition partially unobserved, we cannot do a test for such an assertion where the input to the test is unobserved
+1. MCAR can be tested for (see section 1.9 of Enders[@endersAppliedMissingData2010])
+    1. There are testable propositions, the idea is to assume that the cases with missing data came from the same population and thus have the same means and covariances as the complete cases
+    1. Little's test is one test for MCAR that evaluates the mean differences across subgroups of cases that share the same missing data pattern
+    1. The null hypothesis for Little's test states that the data are MCAR, so a statistically significant test statistic provides evidence against the MCAR mechanism
+
+## Caveats about Little's test {.smaller}
+
+> From section 1.9 of Enders[@endersAppliedMissingData2010]
+>
+> 1. The test does not identify the specific variables that violate MCAR, so it is only useful for testing an omnibus hypothesis that is unlikely to hold in the first place
+> 1. The version of the test outlined above assumes that the missing data patterns share a common covariance matrix. MAR and MNAR mechanisms can produce missing data patterns with different variances and covariances, and the test statistic in Equation 1.4 would not necessarily detect covariance based deviations from MCAR
+> 1. Simulation studies suggest that Little’s test suffers from low power, particularly when the number of variables that violate MCAR is small, the relationship between the data and missingness is weak, or the data are MNAR. Consequently, the test has a propensity to produce Type II errors and can lead to a false sense of security about the missing data mechanism
+
+## Multiple imputation by chained equations (MICE)
+
+## Conclusion
+
+1. We have learnt about the 3 missingness mechanisms of MCAR, MAR, MNAR
+1. We have considered the implications of *complete-case analysis* and *multiple imputation* on bias & efficiency
+1. Challenge remains: a thorough handling of missing data requires causal modelling in order to:
+    i. Distinguish between the 3 missingness mechanisms
+    i. Impute missing data in MNAR scenario where common methods like complete-case analysis or multiple imputation are invalid
+
+
 # Presentation of results {#presentation}
 
 ## Markdown
@@ -1115,8 +1286,8 @@ kableExtra::column_spec(column = 6, width_min = "2.5cm")
 
 ## Cross-references & citations
 
-1. See cross-references and citations on how to add internal cross-references and citations from a bibtex file
-1. See bibliographies and citations on how to add a references and appendix section
+1. See [cross-references](https://bookdown.org/yihui/bookdown/cross-references.html){target="_blank"} and [citations](https://bookdown.org/yihui/bookdown/citations.html){target="_blank"} on how to add internal cross-references and citations from a bibtex file
+1. See [bibliographies and citations](https://bookdown.org/yihui/rmarkdown-cookbook/bibliography.html){target="_blank"} on how to add a references and appendix section
 
 
 # References {.smaller}
