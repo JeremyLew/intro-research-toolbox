@@ -758,62 +758,55 @@ flowchart LR
     ii. E.g. outocme takes on discrete integer values 0, 1, 2, ... (poisson regression)
 4.  GLM gives you a way to relate the outome (which can take on various distributions) with a linear combination of dependent variables
 
-## Formal definition of GLM {.smaller}
+## Formal definition of GLM {.smaller .scrollable}
 
-GLM consists of 2 components. See notations below[^2]
+GLM consists of 2 components
 
-[^2]: Notation
-
-    i.  Let $i$ index the $i$-th observation of your dataset i.e. corresponds to a particular row of your dataset
-
-    ii. Let $y_i$ represent the $i$-th observation of your outcome variable
-
-    iii. Let $X_i$ represent the $i$-th observation of all your independent variables (e.g. age, gender, ethnicity)
-
-::: callout-tip
+::: {.callout-tip}
 # Component 1: What **distribution** does your outcome, $y_i$ take on?
 
-```{=tex}
 \begin{align}
     y_i|X_i \sim \text{member of exponential family} \ \text{(e.g. $y_i$ is normally distributed)}
 \end{align}
-```
+
+i. $i$ indexes the $i$-th observation of your dataset i.e. corresponds to a particular row of your dataset
+i. $y_i$ represents the $i$-th observation of your outcome variable
+i. $X_i$ represents the $i$-th observation of all your independent variables (e.g. age, gender, ethnicity)
+
 :::
 
-::: callout-tip
+::: {.callout-warning}
 # Component 2: What is the **link function** $g$ you want to use?
 
-```{=tex}
 \begin{align}
     g(\mathbb{E}(y_i|X_i)) = X_i^{T} \beta = \underbrace{\beta_0 + \beta_1 age_i + \beta_2 gender_i + \beta_3 ethnicity_i + \cdots}_{\text{this linear combination is continuous}}
 \end{align}
-```
-1.  $g$ is the link function that maps $\mathbb{E}(y_i|x_i)$ to $X_i^{T}\beta$
-2.  It is the link function that enables the mapping of the continuous $X_i^{T}\beta$ to $y_i$, which can be discrete for example
+
+i.  $g$ is the link function that maps $\mathbb{E}(y_i|x_i)$ to $X_i^{T}\beta$
+i.  It is the link function that enables the mapping of the continuous $X_i^{T}\beta$ to $y_i$, which can be discrete for example
 :::
 
-## Formal definition of GLM
-
 2.  In a generalised linear model, the outcome variable $y_1,...,y_n$ are modelled as independent and identically distributed (iid) observations
-3.  The outcome variable is treated as a random variable (i.e. outcome takes on a certain distribution e.g. normal), but NOT the independent variables
+
+2.  The outcome variable is treated as a random variable (i.e. outcome takes on a certain distribution e.g. normal), but NOT the independent variables
 
 ## Family member 1: Linear regression {.smaller}
 
-1.  When our outcome, $y_i$ is continuous and takes on real values (i.e. $y_i \in \mathbb{R}$), we may choose to model $y_i$ with a normal distribution
-2.  Component 1: $y_i|x_i$ is normally distributed
+When our outcome, $y_i$ is continuous and takes on real values (i.e. $y_i \in \mathbb{R}$), we may choose to model $y_i$ with a normal distribution
 
-```{=tex}
-\begin{align*}
-    y_i | x_i \sim \mathcal{N}(X_i^{T}\beta, \sigma^2)
-\end{align*}
-```
-3.  Component 2: link function is the identity function i.e. no transformation done
+::: {.callout-tip}
+## Component 1: $y_i|x_i$ is normally distributed
+$$
+y_i | x_i \sim \mathcal{N}(X_i^{T}\beta, \sigma^2)
+$$
+:::
 
-```{=tex}
-\begin{align*}
-    \mathbb{E}(y_i|x_i) = X_i^{T}\beta = \beta_0 + \beta_1age_i + \beta_2 gender_i + \beta_3 ethnicity_i + \cdots \hspace{2mm} 
-\end{align*}
-```
+::: {.callout-warning}
+## Component 2: link function is the identity function i.e. no transformation done
+$$
+\mathbb{E}(y_i|x_i) = X_i^{T}\beta = \beta_0 + \beta_1age_i + \beta_2 gender_i + \beta_3 ethnicity_i + \cdots
+$$
+:::
 
 ------------------------------------------------------------------------
 
@@ -837,20 +830,27 @@ summary(model)
 
 ------------------------------------------------------------------------
 
-## Family member 2: Logistic regression {.smaller}
+## Family member 2: Logistic regression {.smaller .scrollable}
 
-1.  When our outcome, $y_i$, is discrete and dichotomous (i.e. take two discrete values, 0-1, success-failure), we can model $y_i$ with a Bernoulli distribution
-2.  Component 1: $y_i|x_i$ is Bernoulli distributed
-    i.  $y_i | x_i \sim \mathrm{Bernoulli}(\pi_i)$
-    ii. $\pi_i$ is the probability of success of $y_i$
-    iii. $\mathbb{E}(y_i|x_i) = \pi_i$
-3.  Component 2: Link function, $g$, is the logit function
+When our outcome, $y_i$, is discrete and dichotomous (i.e. take two discrete values, 0-1, success-failure), we can model $y_i$ with a Bernoulli distribution
 
-```{=tex}
-\begin{align*}
+::: {.callout-tip}
+## Component 1: $y_i|x_i$ is Bernoulli distributed
+
+$$
+y_i | x_i \sim \mathrm{Bernoulli}(\pi_i)
+$$
+
+- $\pi_i$ is the probability of success of $y_i$
+- $\mathbb{E}(y_i|x_i) = \pi_i$
+:::
+
+::: {.callout-warning}
+## Component 2: Link function, $g$, is the logit function
+\begin{align}
     g(\mathbb{E}(y_i|x_i)) &= \underbrace{\mathrm{ln} \left( \frac{\mathbb{E}(y_i|x_i)}{1-\mathbb{E}(y_i|x_i)} \right)}_{logit[\mathbb{E}(y_i|x_i)]} = X_i^{T}\beta = \underbrace{\beta_0 + \beta_1 age_i + \beta_2 gender_i + \beta_3 ethnicity_i + \cdots}_{\text{this linear combination is continuous}} 
-\end{align*}
-```
+\end{align}
+:::
 
 ------------------------------------------------------------------------
 
@@ -860,14 +860,159 @@ summary(model)
 2.  Code is largely similar to linear regression except for:
     i.  `family = binomial(link = "logit")`
 
-## Inference
+## Inferring the coefficients {.scrollable}
 
-1.  *Maximum likelihood estimation* is the way to derive the beta coefficients
+::: {.r-fit-text}
+1.  *Maximum likelihood estimation (MLE)* is the way to infer the beta coefficients
+1. The idea behind MLE is that we want to maximise the joint probability of our observed data assuming that the data was generated according to our model i.e. we want to maximise the likelihood function $\mathcal{L}(\beta) = P(y_1, y_2, ..., y_n)$.
+1. In the case of logistic regression, the likelihood function $\mathcal{L}(\beta)$ is:
+    \begin{align}
+        \mathcal{L}(\beta) &= P(y_1, y_2, ..., y_n) \\
+        &= \prod_{i=1}^{n} P(y_i) \\
+        &= \prod_{i=1}^{n} \pi_i^{y_i} (1-\pi_i)^{1-y_i} \\
+    \end{align}
+1. Convert the likelihood to log-likehood to make it easier to work with (we can do that because log is a monotonic function)
+    \begin{align}
+        \mathrm{ln}\ \mathcal{L}(\beta)
+        %
+        &= \mathrm{ln} \prod_{i=1}^{n} \pi_i^{y_i} (1-\pi_i)^{1-y_i} \\
+        %
+        &= \sum_{i=1}^{n} \left[ y_i\mathrm{ln}\pi_i + (1-y_i)\mathrm{ln}(1-\pi_i) \right] \\
+        %
+        &= \sum_{i=1}^{n} \left[ y_i \mathrm{ln} \left( \frac{e^{\beta^{T} x_i}}{1+e^{\beta^{T} x_i}} \right) + (1-y_i) \mathrm{ln} \left( 1-\frac{e^{\beta^{T} x_i}}{1+e^{\beta^{T} x_i}} \right) \right] \\
+        %
+        &= \sum_{i=1}^{n} \left[ y_i \beta^{T}x_i - y_i \mathrm{ln}(1+e^{\beta^{T}x_i}) + (1-y_i) \mathrm{ln} \left( \frac{1}{1+e^{\beta^{T}x_i}} \right) \right] \\
+        %
+        &= \sum_{i=1}^{n} \left[ y_i \beta^{T}x_i - y_i \mathrm{ln}(1+e^{\beta^{T}x_i}) - (1-y_i) \mathrm{ln} (1 + e^{\beta^{T}x_i} ) \right] \\
+        %
+        &= \sum_{i=1}^{n} \left[ y_i \beta^{T}x_i - \mathrm{ln}(1+e^{\beta^{T}x_i}) \right] \\
+    \end{align}
+1. In order to maximise the log-likelihood, we will use the iteratively reweighted least squares (IRLS) algorithm which is a Newton-Raphson like method
+    \begin{align}
+    \beta^{(t+1)} = \beta^{(t)} - \textit{H}^{-1}(\beta^{(t)}) \nabla_{\beta} \mathcal{L}(\beta^{(t)})
+    \end{align}
+    The idea behind this is to update $\beta$ via a series of iterations such that on every update, we are stepping in the direction of steepest ascent.
+1. To use the IRLS, first we need to calculate the gradient of the log-likelihood
+    \begin{align}
+        \nabla_{\beta} \mathrm{ln}\ \mathcal{L}(\beta)
+        &= \sum_{i=1}^{n} \left[ y_i \nabla_\beta \beta^{T}x_i - \nabla_\beta \mathrm{ln}(1+e^{\beta^{T}x_i})  \right] \\
+        %
+        &= \sum_{i=1}^{n} \left[ y_i x_i - \frac{e^{\beta^{T}x_i}}{1+e^{\beta^{T}x_i}} x_i \right] \\
+        %
+        &= \sum_{i=1}^{n} (y_i - \pi_i) x_i \\
+        & = X^{T}(y - \pi)
+    \end{align}
+1. Next, we will calculate the Hessian, $H$, of the log-likelihood by taking derivatives one more time from the gradient.
+    \begin{align}
+    H &= -\sum_{i=1}^{n} \pi_i (1-\pi_i) x_i x_i^{T} \\
+    &= - X^{T} W X \\
+    \end{align}
 
-## Interpretation: What do the coefficients mean?
+    where $W$ is a diagonal weight matrix given by:
+    \begin{align}
+        W = diag\{\pi_1 (1-\pi_1), \pi_2 (1-\pi_2), ..., \pi_n (1-\pi_n)\}
+    \end{align}
+1. Now that we have the components, we can substitute these back into (5) to expand it out
+    \begin{align}
+        \beta^{(t+1)} = \beta^{(t)} + (X^{T}W^{(t)}X)^{-1}X^{T}(y - \pi^{(t)})
+    \end{align}
+:::
+
+## Interpret coefficients: logistic regression {.scrollable}
+
+::: {.r-fit-text}
+1. Step 1: Start from the equation linking outcome to indepenent variables
+    \begin{align}
+    \mathrm{ln}\left(\underbrace{\frac{\mathbb{E}(y_i|x_i)}{1-\mathbb{E}(y_i|x_i)}}_{odds_i}\right) = \beta_0 &+ \beta_1 age_i + \beta_2 gender^{(male)}_i \\ 
+
+    &+ \beta_3 ethnicity^{(malay)}_i + \beta_4 ethnicity^{(indian)}_i + \cdots
+    \end{align}
+
+1. Step 2: Analyse unit changes
+
+    i. Continuous example: 1 unit increase in age, with everything else held constant. The exponent of $\beta_1$ gives us the odds ratio for every unit increase in age.
+        \begin{align}
+            \mathrm{ln}\ odds_i|_{age=a+1} - \mathrm{ln}\ odds_i|_{age=a} &= \beta_1 (a+1) - \beta_1 (a) \\
+            \mathrm{ln}\ \frac{odds_i|_{age=a+1}}{odds_i|_{age=a}} &= \beta_1 \\
+            \frac{odds_i|_{age=a+1}}{odds_i|_{age=a}} &= e^{\beta_1}
+        \end{align}
+    
+    i. Categorical example: compare to reference category, with everything else held constant. The exponent of $\beta_3$ gives us the odds ratio of malay compared to chinese.
+        \begin{align}
+        \mathrm{ln}\ odds_i|_{ethnicity=malay} - \mathrm{ln}\ odds_i|_{ethnicity=chinese} &= \beta_3 \\
+        \mathrm{ln}\ \frac{odds_i|_{ethnicity=malay}}{odds_i|_{ethnicity=chinese}} &= \beta_3 \\
+        \frac{odds_i|_{ethnicity=malay}}{odds_i|_{ethnicity=chinese}} &= e^{\beta_3}
+        \end{align}
+
+::: {.aside}
+Notes: 
+
+1. $odds_i$ represents the odds of "success" of the outcome, which is coded as 1
+
+1. Reference categories do not have $\beta$ coefficient due to one-hot encoding e.g. gender: female, ethnicity: chinese
+:::
+
+:::
 
 
-## Family member 3: Conway-Maxell-Poisson (CMP) regression {.smaller}
+## Family member 3: Gamma regression {.smaller .scrollable} 
+
+When our outcome $y_i$, is continuous and positive, we can model $y_i$ with a Gamma distribution
+
+::: {.callout-tip}
+## Component 1: $y_i$ is Gamma distributed
+$$ 
+y_i | X_i \sim Gamma(\alpha, \beta)
+$$
+:::
+
+::: {.callout-warning}
+## Component 2: One choice of the link function, $g$, is the ln function
+$$
+\begin{align*}
+    g(\mathbb{E}(y_i|X_i)) = \mathrm{ln}\ \mathbb{E}(y_i|X_i) = \beta_0 + \beta_1 age_i + \beta_2 gender_i + \beta_3 ethnicity_i + \cdots \\
+\end{align*} 
+$$
+:::
+
+Notes:
+
+1. The inverse of the ln function is the exponent function. Alternatively, we can also express $\mathbb{E}(y_i|x_i) = e^{\beta_0 + \beta_1 age_i + \beta_2 gender_i + \beta_3 ethnicity_i + \cdots}$
+
+1. From this expression, we can see that the inverse of the link function (i.e. exponent) maps $X_i^{T}\beta$ to $\mathbb{E}(y_i|X_i)$. And we know that this is a valid function because $\mathbb{E}(y_i|X_i)=e^{X_i^{T}\beta} > 0$
+
+
+## Interpret coefficients: gamma regression {.scrollable}
+
+::: {.r-fit-text}
+1. Step 1: Start from the equation linking outcome to independent variables
+    \begin{align}
+    \mathrm{ln}\ \mathbb{E}(y_i|X_i) = \beta_0 &+ \beta_1 age_i + \beta_2 gender^{(male)}_i \\
+    &+\beta_3 ethnicity^{(malay)}_i + \beta_4 ethnicity^{(indian)}_i + \cdots \\
+    %
+    \end{align}
+1. Step 2: Analyse unit changes
+    i. Continuous example: 1 unit increase in age, with everything else held constant. The percentage change in mean outcome for every unit increase in age can be given from $e^{\beta_1} - 1$
+        \begin{align}
+            \mathrm{ln}\ \mathbb{E}(y_i|X_i)|_{age=a+1} - \mathrm{ln}\ \mathbb{E}(y_i|X_i)|_{age=a} &= \beta_1 (a+1) - \beta_1(a) \\
+            %
+            \mathrm{ln}\ \frac{\mathbb{E}(y_i|X_i)|_{age=a+1}}{ \mathbb{E}(y_i|X_i)|_{age=a}} &= \beta_1 \\
+            %
+            \frac{\mathbb{E}(y_i|X_i)|_{age=a+1}}{ \mathbb{E}(y_i|X_i)|_{age=a}} -1 &= e^{\beta_1} - 1
+        \end{align}
+    i. Interaction terms example: compare vs reference category, age at some value $a$, with everything else held constant
+        a. The percentage change in mean outcome for male compared to female can be given from $e^{\beta_2 + \beta_3 a} - 1$ 
+        a. Notice now that this percentage change which was $\beta_2$ (if no interaction had been defined) is now modified by $\beta_3 a$ which depends on age
+        \begin{align}
+            \mathrm{ln}\ \mathbb{E}(y_i|X_i)|_{age=a, gender=male} - \mathrm{ln}\ \mathbb{E}(y_i|X_i)|_{age=a, gender=female} &= (\beta_1 a + \beta_2 + \beta_3 a) - \beta_1 a  \\
+            %
+            \mathrm{ln}\ \frac{\mathbb{E}(y_i|X_i)|_{age=a, gender=male}}{ \mathbb{E}(y_i|X_i)|_{age=a, gender=female}} &= \beta_2 + \beta_3 a \\
+            %
+            \frac{\mathbb{E}(y_i|X_i)|_{age=a, gender=male}}{ \mathbb{E}(y_i|X_i)|_{age=a, gender=female}} -1 &= e^{\beta_2 + \beta_3 a} - 1
+        \end{align}
+:::
+
+## Family member 4: Conway-Maxell-Poisson (CMP) regression {.smaller}
 
 1. When our outcome variable is a "count", the poisson regression model is used because the poisson distribution models counts better than say
 linear regression which assumes that the outcome variable is normally distributed
