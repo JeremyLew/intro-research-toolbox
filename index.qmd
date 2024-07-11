@@ -16,7 +16,7 @@ csl: vancouver-superscript.csl
 ---
 
 ```{r setup, include=FALSE}
-pacman::p_load(tidyverse, magrittr, here, palmerpenguins)
+pacman::p_load(tidyverse, magrittr, here, palmerpenguins, kableExtra)
 ```
 
 ## Topics
@@ -693,9 +693,58 @@ knitr::kable(align = c("l", rep("r", 5)))
 1. `tableby` function invoked by these 3 lines
 
 
-## Measures of central tendency (repeated measures) {.smaller .scrollable}
+## Measures of central tendency (repeated measures) {.scrollable}
 
-1. The [`paired` function](https://cran.r-project.org/web/packages/arsenal/vignettes/paired.html){target="_blank"} from [`arsenal`](https://mayoverse.github.io/arsenal/){target="_blank"} package
+::: {.r-fit-text}
+
+1. Suppose we have repeated measures of HbA1c and LDL from patients at e.g. baseline and 12-month
+   ```{r}
+   generate_fake_patient_data <- function(id) {
+     data.frame(list(
+       patient_id = id,
+       time = c("baseline", "12-month"),
+       hba1c = runif(n = 2, min = 4, max = 14),
+       ldl = sample(c("good control", "bad control"))
+     ))
+   }
+   
+   set.seed(2024)
+   data <- map(
+     sprintf("P%s", str_pad(1:30, width = 2, pad = 0)),
+     generate_fake_patient_data
+   ) %>%
+     bind_rows()
+   print(head(data, 10))
+   ```
+
+1. The [`paired` function](https://cran.r-project.org/web/packages/arsenal/vignettes/paired.html){target="_blank"} from [`arsenal`](https://mayoverse.github.io/arsenal/){target="_blank"} package helps us tabulate pre-post tests easily
+
+   ```{r}
+   # pacman::p_load(arsenal, kableExtra)
+   
+   table <- paired(
+     time ~ signed.rank(hba1c) + ldl,
+     data = data,
+     id = patient_id,
+     control = paired.control(digits = 2,
+                              numeric.stats = c("Nmiss2", "meansd", "medianq1q3", "range"),
+                              numeric.test = "signed.rank",
+                              signed.rank.correct = FALSE))
+
+   table %>%
+     summary(text = TRUE) %>%
+     kable(align = c("l", rep("r", 4))) %>%
+     column_spec(column = 1, width_min = "4cm") %>%
+     column_spec(column = 2:4, width_min = "3cm") %>%
+     column_spec(column = 5, width_min = "2.5cm")
+   ```
+
+   ```{r}
+   tests(table) %>%
+   kable()
+   ```
+
+:::
 
 
 
@@ -1396,37 +1445,78 @@ link-citations: true
     ```
 
 
-## Presenting tables {#pres_table .smaller .scrollable}
+## Presenting tables {#pres_table .scrollable}
+
+::: {.r-fit-text}
 
 ```{r}
-#| code-line-numbers: "|7"
+#| code-line-numbers: "|8"
 pacman::p_load(arsenal, knitr)
 
 tableby(species ~ sex + island + bill_length_mm,
         data = penguins,
-        control = tableby.control(numeric.stats = c("Nmiss", "meansd", "medianq1q3", "range"))) %>%
+        control = tableby.control(numeric.stats = c("Nmiss", "meansd", "medianq1q3", "range"),
+                                  digits = 2)) %>%
 summary(text = TRUE) %>%
 knitr::kable(align = c("l", rep("r", 5))) # <1>
 ```
 
 1. The [`kable`](https://bookdown.org/yihui/rmarkdown-cookbook/kable.html){target="_blank"} function converts the table object to html
 
+:::
 
-## Formatting HTML tables {.smaller .scrollable}
+
+## Formatting HTML tables {.scrollable}
 
 The [kableExtra](https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html){target="_blank"} package provides useful functions to format tables e.g. changing column width, changing colors, font size, fixed header rows etc.
 
+::: {.r-fit-text}
+
 ```{r}
-#| code-line-numbers: "|8"
+#| code-line-numbers: "|9-11"
 pacman::p_load(arsenal, knitr, kableExtra)
 
 tableby(species ~ sex + island + bill_length_mm,
         data = penguins,
-        control = tableby.control(numeric.stats = c("Nmiss", "meansd", "medianq1q3", "range"))) %>%
+        control = tableby.control(numeric.stats = c("Nmiss", "meansd", "medianq1q3", "range"),
+                                  digits = 2)) %>%
 summary(text = TRUE) %>%
 kable(align = c("l", rep("r", 5))) %>%
-kableExtra::column_spec(column = 6, width_min = "2.5cm")
+kableExtra::column_spec(column = 1, width_min = "4.75cm") %>%
+kableExtra::column_spec(column = 2:5, width_min = "5.75cm") %>%
+kableExtra::column_spec(column = 6, width_min = "2.25cm")
 ```
+
+:::
+
+
+## Formatting HTML table subheaders {.scrollable}
+
+::: {.r-fit-text}
+
+If you added labels to your dataframe using the [`labelled`](https://cran.r-project.org/web/packages/labelled/vignettes/intro_labelled.html){target="_blank"} package, it can be presented as subheaders via the `labelTranslations` argument in `summary`
+
+```{r}
+#| code-line-numbers: "1-4||10"
+labels <- list(sex = "Sex",
+               island = "Island",
+               bill_length_mm = "Bill length (mm)")
+labelled::var_label(penguins) <- labels
+
+tableby(species ~ sex + island + bill_length_mm,
+        data = penguins,
+        control = tableby.control(numeric.stats = c("Nmiss", "meansd", "medianq1q3", "range"),
+                                  digits = 2)) %>%
+summary(text = TRUE, labelTranslations = map(labelled::var_label(penguins), ~ str_glue("**{.x}**"))) %>% # <1>
+kable(align = c("l", rep("r", 5))) %>%
+kableExtra::column_spec(column = 1, width_min = "5.5cm") %>%
+kableExtra::column_spec(column = 2:5, width_min = "5.75cm") %>%
+kableExtra::column_spec(column = 6, width_min = "2.25cm")
+```
+
+1. The ** will render the text bold in Rmarkdown html documents
+
+:::
 
 
 ## Cross-references & citations
