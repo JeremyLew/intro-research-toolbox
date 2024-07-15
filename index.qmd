@@ -1123,6 +1123,42 @@ We will use the [mpcmp](https://thomas-fung.github.io/mpcmp/){target="_blank"}[@
 <!-- ## Sample size calculation -->
 
 
+
+
+# Analysis: Tests of reliability
+
+## Internal Consistency
+
+::: {.r-fit-text}
+
+1. Cronbach's alpha is a measure of internal consistency of questionnaire
+1. Interpreting Cronbach’s alpha
+    i. Cronbach’s alpha between 0.70 to 0.80 is considered good enough[@fieldDiscoveringStatisticsUsing2012a]
+    i. Cronbach’s alpha is shown as raw_alpha in the output
+1. Caveats:
+    i. All else equal, alpha will increase as the number of items on the scale increases[@fieldDiscoveringStatisticsUsing2012a] (page 799, section 17.8.2)
+    i. If responses lack variability (i.e. almost everyone gives the same response), alpha tends to be poor[@fieldDiscoveringStatisticsUsing2012a] (page 803)
+    i. "If alpha is too high it may suggest that some items are redundant as they are testing the same question but in a different guise. A maximum alpha value of 0.90 has been recommended" [@tavakolMakingSenseCronbach2011a]
+
+:::
+
+## Test-retest reliability
+
+::: {.r-fit-text}
+
+1. We will use the Intraclass Correlation Coefficient to assess for test-retest reliability
+1. Out of the 10 variants of ICC, we will compute the "two-way mixed effects, absolute agreement, single rater/measurement" ICC variant or ICC (A,1) of McGraw and Wong[@mcgrawFormingInferencesIntraclass1996] per recommendations from[@kooGuidelineSelectingReporting2016a; @qinAssessingTestretestReliability2019]:
+1. When it comes to interpreting the ICC, according to Koo et al.[@kooGuidelineSelectingReporting2016a]:
+    i. ICC less than 0.5: poor reliability
+    i. ICC between 0.5 and 0.75: moderate reliability
+    i. ICC between 0.75 and 0.90: good reliability
+    i. ICC greater than 0.90: excellent reliability
+
+:::
+
+
+
+
 # Analysis: Comparative effectiveness research
 
 ## Background
