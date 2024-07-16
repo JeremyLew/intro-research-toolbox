@@ -612,17 +612,130 @@ penguins %>%
   table(useNA = "ifany")
 ```
 
-## Common functions - forcats::fct_relevel
+## Common functions - forcats::fct_relevel {.smaller .scrollable}
+
+1. If we convert a character vector to a factor vector, the levels will be arranged in alphabetical order
+   automatically if unspecified
+   ```{r}
+   penguins %>%
+     mutate(bill_length_type = case_when(
+       bill_length_mm < 40 ~ "short bill",
+       between(bill_length_mm, 40, 50) ~ "medium bill",
+       bill_length_mm > 50 ~ "long bill",
+       TRUE ~ NA_character_) %>% factor()
+     ) %>%
+     .$bill_length_type %>% levels()
+   ```
+
+1. We can specify the levels of the factor using the `levels` argument
+   ```{r}
+   penguins %>%
+     mutate(bill_length_type = case_when(
+       bill_length_mm < 40 ~ "short bill",
+       between(bill_length_mm, 40, 50) ~ "medium bill",
+       bill_length_mm > 50 ~ "long bill",
+       TRUE ~ NA_character_) %>%
+         factor(levels = c("short bill", "medium bill", "long bill"))
+     ) %>%
+     .$bill_length_type %>% levels()
+   ```
+
+1. The factor vector will only contain values specified by `levels`.
+   Any existing character values unspecified in `levels` (e.g. "long bill") will be converted to NA
+   ```{r}
+   penguins %>%
+     mutate(bill_length_type = case_when(
+       bill_length_mm < 40 ~ "short bill",
+       between(bill_length_mm, 40, 50) ~ "medium bill",
+       bill_length_mm > 50 ~ "long bill",
+       TRUE ~ NA_character_) %>%
+         factor(levels = c("short bill", "medium bill"))
+     ) %>%
+     .$bill_length_type %>% levels()
+   ```
+
+1. [fct_relevel](https://forcats.tidyverse.org/reference/fct_relevel.html){target="_blank"} relevels levels of a factor vector (if not already a factor eg. character vector, it will first convert it to a factor vector) Any unspecified levels will follow after specified ones, left in the existing order
+   ```{r}
+   penguins %>%
+     mutate(bill_length_type = case_when(
+       bill_length_mm < 40 ~ "short bill",
+       between(bill_length_mm, 40, 50) ~ "medium bill",
+       bill_length_mm > 50 ~ "long bill",
+       TRUE ~ NA_character_) %>%
+         fct_relevel("short bill", "medium bill")
+     ) %>%
+     .$bill_length_type %>% levels()
+   ```
 
 ## Common functions - forcats::fct_collapse
 
 ## Common functions - stringr::str_detect
 
-## Common functions - dplyr::pivot_wider & longer
+1. We can make use of [regular expression](https://rstudio.github.io/cheatsheets/strings.pdf){target="_blank"} with
+   str_detect for filtering, cleaning etc.
+   ```{r}
+    
+   ```
+
+## Common functions - dplyr::pivot_wider {.smaller .scrollable}
+
+1. Suppose we have some data in long format
+
+   ```{r}
+   # Generate fake patient data for illustration
+   generate_fake_patient_data <- function(id) {
+     data.frame(list(
+       patient_id = id,
+       time = c("baseline", "12mth"),
+       hba1c = runif(n = 2, min = 4, max = 14),
+       ldl = sample(c("good control", "bad control"))
+     ))
+   }
+   
+   set.seed(2024)
+   data <- map(
+     sprintf("P%s", str_pad(1:344, width = 2, pad = 0)),
+     generate_fake_patient_data
+   ) %>%
+     bind_rows()
+   print(head(data, 10))
+   ```
+
+1. We can make use of [pivot_wider](https://tidyr.tidyverse.org/reference/pivot_wider.html){target="_blank"} to reshape our data
+   from long to wide
+   ```{r}
+   data_wide <- data %>%
+     pivot_wider(id_cols = patient_id,
+                 names_from = "time",
+                 names_glue = "{.value}_{time}",
+                 values_from = c(hba1c, ldl)) 
+   head(data_wide, 15)
+   ```
+
+## Common functions - dplyr::pivot_longer
 
 ## Common functions - dplyr::bind_rows, bind_cols 
 
-## Common functions - dplyr::mutate + across
+## Common functions - dplyr::mutate + across {.smaller .scrollable}
+
+1. This combination of `mutate` & `across` enables us to apply a function to multiple columns of a dataframe
+   ```{r}
+   penguins %>%
+     mutate(across(.cols = c(bill_length_mm, bill_depth_mm), 
+                   .fns = ~ floor(.x),
+                   .names = "{.col}_floored")) %>%
+     select(matches("bill_(length|depth)"))
+   ```
+
+1. If we omit the `.names` argument, the function will be applied in-place
+   ```{r}
+   penguins %>%
+     mutate(across(.cols = c(bill_length_mm, bill_depth_mm), 
+                   .fns = ~ floor(.x))) %>%
+     select(matches("bill_(length|depth)"))
+   ```
+
+
 
 
 # Data visualisation
@@ -713,7 +826,9 @@ knitr::kable(align = c("l", rep("r", 5)))
      sprintf("P%s", str_pad(1:30, width = 2, pad = 0)),
      generate_fake_patient_data
    ) %>%
-     bind_rows()
+     bind_rows() %>%
+     mutate(across(.cols = time,
+                   .fns = ~ fct_relevel(.x, "baseline", "12-month")))
    print(head(data, 10))
    ```
 
