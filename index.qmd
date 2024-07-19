@@ -1274,35 +1274,120 @@ We will use the [mpcmp](https://thomas-fung.github.io/mpcmp/){target="_blank"}[@
 
 
 
-# Analysis: Comparative effectiveness research
+# Analysis: Comparative effectiveness research using observational data
 
-## Background
+## What is comparative effectiveness research? {.smaller}
 
-1. 
-1. Confounding bias
+1. Comparative effectiveness research is the generation and synthesis of evidence that compares the benefits and harms of alternative methods to prevent, diagnose, treat, and monitor a clinical condition or to improve the delivery of care [@gatsonisMethodsComparativeEffectiveness2015]
+1. _Effectiveness_ vs _efficacy_
+    i. _Effectiveness_ refers to the performance of an intervention in "real-world" clinical settings while _efficacy_ refers to the performance of an intervention under "ideal" circumstances [@gatsonisMethodsComparativeEffectiveness2015]
+1. Examples:
+    i. Compare the effectiveness of different treatment options [@jaksaUsingPrimaryCare2022]
+    i. Compare the effectiveness of a health intervention programme vs usual care group [@luImpactLongitudinalVirtual2021]
 
-## Purpose of propensity score matching
 
-1. One of the methods to deal with confounding bias in retrospective observational study
-1. Compare the effectiveness of different treatment options [@jaksaUsingPrimaryCare2022]
-1. Compare the effectiveness of a health intervention programme vs usual care group [@luImpactLongitudinalVirtual2021]
+## Target trial framework {.smaller .scrollable}
+
+1. Suppose you are interested in conducting a pragmatic randomised controlled trial (RCT) to evaluate your health intervention vs usual care
+1. However, conducting this trial is infeasible so we resort to emulating this trial with observational data
+1. The target trial framework[@hernanUsingBigData2016; @hernanSpecifyingTargetTrial2016] gives us guidelines to conceptualise our study
+1. An example of the application of the target trial framework[@coteIntroductionTargetTrial2024]
+![Table III from Cote et al.](images/cote_2024_table3.png)
+
+
+## Target trial framework pointers {.smaller .scrollable}
+
+1. Extra pointers adapted from [@hernanUsingBigData2016; @wangTargetTrialFramework2024]
+
+<table>
+  <colgroup>
+    <col style="width:20%">
+    <col style="width:80%">
+  </colgroup>
+  <thead>
+    <tr>
+      <th>Protocol component</th>
+      <th>Observational study that
+          emulates the RCT</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Eligibility criteria</td>
+      <td>
+        • Apply the same inclusion/exclusion criteria<br>
+        • Assuming that we have variables needed for inclusion/exclusion in our observational dataset<br>
+        • Eligibility should only be determined based on info available at baseline (cf. immortal time bias)<br>
+        • Selection bias if we exclude patients with missing data (analogue of dropout/loss to follow-up in a trial) if dropout is associated with intervention and outcome<br>
+        • Patients could be eligible at multiple time points. We have a choice of (1) single eligible time: set baseline as the first timepoint when eligibility is met within a time period or (2) all eligible times (or large subset): emulate multiple nested trials
+      </td>
+    </tr>
+    <tr>
+      <td>Treatment strategies</td>
+      <td>
+        • Assign patients to strategy consistent with their baseline data<br>
+        • Ensure treatment arms are consistent e.g. both arms contain only new initiators of a treatment as opposed to one arm having patients who are already receiving treatment some time before baseline, which affects the outcome<br>
+        • Positivity: _"each individual should have positive probability of receving each level of exposure for every combination of covariates"_
+          (i.e. a patient should not be precluded from a level of exposure to the intervention at the outset)<br>
+        • Consistency: _"there cannot be two versions of a treatment that would result in different outcomes"_
+      </td>
+    </tr>
+    <tr>
+      <td>Assignment procedures</td>
+      <td>
+        • Can only emulate trials without blind assignment because individuals/care providers in the dataset
+          are aware of the received treatments<br>
+        • Patients are not randomly assigned to treatment strategies. methods to achieve exchangeability at baseline e.g. propensity score matching, inverse probability weighting and g-methods to deal with time-varying confounding<br>
+        • Limitation: residual confounding from unmeasured confounders
+      </td>
+    </tr>
+    <tr>
+      <td>Follow-up period</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>Outcome</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>Causal contrast of interests</td>
+      <td>
+        • Intention-to-treat effect: we would use patients who were prescribed medication for treatment initiation<br>
+        • Per-protocol effect: we would use patients who adhered to the treatment. Adjustment for postbaseline confounding is needed because postbaseline prognostic factors associated with subsequent adherence to treatment may be affected by prior adherence
+      </td>
+    </tr>
+    <tr>
+      <td>Analysis plan</td>
+      <td>
+        • Proper definition of baseline/time zero is important (affects assessment of eligibility)<br>
+        • Best way to define time zero is the time time when an eligible individual initiates a treatment strategy
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+## Propensity score matching {.smaller}
+
+1. What is a propensity score?
+1. What is the purpose of propensity score matching?
+1. How is propensity score estimated?
+1. How is propensity score matching done?
 
 ## How do we choose matching variables?
 
-```{=html}
-<!-- ## Gaps
 
-1.  How to relate "predictors" with outcome and how outcome links to other outcome
-2.  outcome complexity/adherence
-3.  other outcome: quality of life, cost of care, number of visits
-4.   -->
-```
+## How do we evaluate covariate balance after matching?
+
+1. We make use of the absolute _standardized mean difference (SMD)_ metric
+1. Rule of thumb
+1. p-values are not used because
+
+
+
 
 # Analysis: Intervention effect estimation
 
-1. 
-
-## 
 
 
 # Analysis: Missing data
