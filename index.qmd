@@ -667,17 +667,22 @@ penguins %>%
      .$bill_length_type %>% levels()
    ```
 
-## Common functions - forcats::fct_collapse
+## Common functions - forcats::fct_collapse {.smaller .scrollable}
 
-## Common functions - stringr::str_detect
-
-1. We can make use of [regular expression](https://rstudio.github.io/cheatsheets/strings.pdf){target="_blank"} with
-   str_detect for filtering, cleaning etc.
+1. We can collapse levels of a factor variable using forcat's [fct_collapse](https://forcats.tidyverse.org/reference/fct_collapse.html){target="_blank"} function
+1. The `island` variable has 3 levels
    ```{r}
-    
+   penguins$island %>% table()
+   ```
+1. Suppose we want to collapse `island` into 2 levels, we can apply `fct_collapse` like so
+   ```{r}
+   penguins %>%
+     mutate(island = fct_collapse(island, "Dream/Torgersen" = c("Dream", "Torgersen"))) %>%
+     .$island %>%
+     table()
    ```
 
-## Common functions - dplyr::pivot_wider {.smaller .scrollable}
+## Common functions - tidyr::pivot_wider {.smaller .scrollable}
 
 1. Suppose we have some data in long format
 
@@ -701,7 +706,7 @@ penguins %>%
    print(head(data, 10))
    ```
 
-1. We can make use of [pivot_wider](https://tidyr.tidyverse.org/reference/pivot_wider.html){target="_blank"} to reshape our data
+1. We can make use of tidyr's [pivot_wider](https://tidyr.tidyverse.org/reference/pivot_wider.html){target="_blank"} to reshape our data
    from long to wide
    ```{r}
    data_wide <- data %>%
@@ -712,7 +717,24 @@ penguins %>%
    head(data_wide, 15)
    ```
 
-## Common functions - dplyr::pivot_longer
+## Common functions - tidyr::pivot_longer {.smaller .scrollable}
+
+1. Suppose instead that we were given data in a wide format
+   ```{r}
+   print(head(data_wide, 10))
+   ```
+
+1. We can make use of tidyr's [pivot_longer](https://tidyr.tidyverse.org/reference/pivot_longer.html){target="_blank"}
+   to reshape our data into long format
+   ```{r}
+   data_wide %>%
+     pivot_longer(
+       cols = matches("baseline|12mth"),
+       names_pattern = "(.*)_(baseline|12mth)",
+       names_to = c(".value", "time")
+     )
+   ```
+
 
 ## Common functions - dplyr::bind_rows, bind_cols 
 
@@ -733,6 +755,45 @@ penguins %>%
      mutate(across(.cols = c(bill_length_mm, bill_depth_mm), 
                    .fns = ~ floor(.x))) %>%
      select(matches("bill_(length|depth)"))
+   ```
+
+## Common functions - stringr::str_detect {.smaller .scrollable}
+
+1. We can make use of [regular expressions](https://rstudio.github.io/cheatsheets/strings.pdf){target="_blank"} in
+   stringr's [str_detect](https://stringr.tidyverse.org/reference/str_detect.html){target="_blank"} function together with 
+   `filter`, or `if_else`/`case_when` for data cleaning
+
+1. Here we create a `species_plus` variable
+   ```{r}
+   set.seed(2024)
+   penguins <- penguins %>%
+     mutate(across(
+       .cols = "species",
+       .fns = ~ paste(.x,
+         sample(c("baby", "teenager", "adult"), nrow(penguins), replace = TRUE),
+         sex,
+         sep = "_"
+       ),
+       .names = "{.col}_plus"
+     ))
+   # view counts of species_plus
+   table(penguins$species_plus)
+   ```
+
+1. We can use a regular expression to identify categories
+   ```{r}
+   penguins %>%
+     mutate(across(
+       .cols = "species_plus",
+       .fns = ~ case_when(
+         # Chinstrap/Gentoo, not followed by baby, male/female
+         str_detect(.x, "((Chinstrap|Gentoo)(?!_baby)).*(male|female)") ~ "DO SOMETHING",
+         TRUE ~ .x # maintain existing value
+       ),
+       .names = "{.col}2" 
+     )) %>%
+     .$species_plus2 %>%
+     table()
    ```
 
 
@@ -1759,6 +1820,41 @@ kableExtra::column_spec(column = 6, width_min = "2.25cm")
 
 1. See [cross-references](https://bookdown.org/yihui/bookdown/cross-references.html){target="_blank"} and [citations](https://bookdown.org/yihui/bookdown/citations.html){target="_blank"} on how to add internal cross-references and citations from a bibtex file
 1. See [bibliographies and citations](https://bookdown.org/yihui/rmarkdown-cookbook/bibliography.html){target="_blank"} on how to add a references and appendix section
+
+
+## Reflection questions {.scrollable}
+
+::: {.r-fit-text}
+
+-	Can you provide a brief overview of your research and its main objectives?
+-	What was your rationale for choosing this particular research topic?
+-	How did you develop your research questions or hypotheses?
+- What gaps in the literature is your study intended to address?
+-	Can you explain your chosen methodology and why it was appropriate for your study?
+-	What were the main challenges you encountered during your research, and how did you overcome them?
+-	How does your research contribute to the existing body of knowledge in your field?
+-	Can you discuss the key theories or concepts that informed your research?
+-	Were there any conflicting views in the literature, and how did you address them?
+-	How did you ensure that your literature review was comprehensive and up-to-date?
+-	Can you explain your data collection process and any ethical considerations?
+-	What were the main findings of your research?
+-	How did you analyze your data, and why did you choose those specific analytical methods?
+- How did you choose the variables in your model?
+-	Were there any unexpected results, and how did you interpret them?
+-	How do your findings relate to previous research in the field?
+-	What are the practical implications of your research?
+-	How might your findings be applied in real-world settings?
+-	What are the limitations of your study, and how might they be addressed in future research?
+-	If you were to continue this research, what would be your next steps?
+-	Looking back, what would you do differently if you were to conduct this research again?
+-	How has this research process contributed to your development as a researcher?
+-	Can you identify any potential biases in your research and how you addressed them?
+-	How do you see your research fitting into the broader context of your field?
+-	Can you elaborate on any assumptions you made during your research?
+-	How confident are you in your conclusions, and what evidence supports them?
+
+:::
+
 
 
 # References {.smaller}
