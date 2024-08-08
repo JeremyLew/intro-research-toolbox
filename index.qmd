@@ -16,7 +16,7 @@ csl: vancouver-superscript.csl
 ---
 
 ```{r setup, include=FALSE}
-pacman::p_load(tidyverse, magrittr, here, palmerpenguins, kableExtra)
+pacman::p_load(tidyverse, magrittr, here, palmerpenguins, kableExtra, ezyr)
 ```
 
 ## Topics
@@ -1035,22 +1035,57 @@ $$
 
 ------------------------------------------------------------------------
 
-## Running a linear regression in R {.smaller}
+## Running a linear regression in R {.smaller .scrollable}
 
 1.  Notice the use of the formula syntax. LHS of the `~` is the dependent variable, while RHS are the independent variables
-2.  Notice the `family` argument contains the 2 components of the GLM we discussed earlier
+1.  Notice the `family` argument contains the 2 components of the GLM we discussed earlier
+    ```{r}
+    #| code-line-numbers: "|2|6|8"
+    model <- 
+      glm(body_mass_g ~ species + bill_length_mm +
+                        bill_depth_mm + 
+                        flipper_length_mm + sex,
+          data = penguins,
+          family = gaussian(link = "identity"))
+    
+    summary(model)
+    ```
+
+1. We can call `coef` and `summary` to access the beta coefficients and p-values
+   ```{r}
+   coef(summary(model))
+   ```
+
+1. We can call `confint.default` to get the confidence intervals
+   ```{r}
+   confint.default(model)
+   ```
+
+## Tabulating the results of a linear regression {.smaller .scrollable}
+
+1. We can make use of the of the [`tabulate_glm_result`](https://jeremylew.github.io/ezyr/reference/tabulate_glm_result.html){target="_blank"} function in the [`ezyr`](https://jeremylew.github.io/ezyr/reference/index.html){target="_blank"} package to tabulate our results
 
 ```{r}
-#| output-location: column-fragment
-#| code-line-numbers: "|2|6|8"
-model <- 
-  glm(body_mass_g ~ species + bill_length_mm +
-                    bill_depth_mm + 
-                    flipper_length_mm + sex,
-      data = penguins,
-      family = gaussian(link = "identity"))
+# library(ezyr)
 
-summary(model)
+model %>%
+  tabulate_glm_result() %>%
+  mutate(across(.cols = "variable_name", 
+                .fns = ~ case_when(var0 == "header" ~ sprintf("**%s**", .x),
+                                   TRUE ~ sprintf("- %s", .x)))) %>%
+  mutate(across(.cols = "Beta (95% CI)",
+                .fns = ~ case_when(var0 == "Ref" ~ "Ref",
+                                   TRUE ~ .x))) %>%
+  # bold p-values if < 0.05
+  mutate(across(.col = "p_value_",
+                .fns = ~ case_when(p_value < 0.05 ~ sprintf("**%s**", .x),
+                                   TRUE ~ .x))) %>%
+  select(variable_name, "Beta (95% CI)", p_value_) %>%
+  rename("Independent variables" = variable_name,
+         "p-value" = p_value_) %>%
+  kable(align = c("l", rep("r", 2))) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+                fixed_thead = T, full_width = T)
 ```
 
 ------------------------------------------------------------------------
@@ -1079,11 +1114,64 @@ $$
 
 ------------------------------------------------------------------------
 
-## Running a logistic regression in R
+## Running a logistic regression in R {.smaller .scrollable}
 
-1.  To be filled only after completion of exercise
-2.  Code is largely similar to linear regression except for:
-    i.  `family = binomial(link = "logit")`
+1. Suppose we classify penguins into _light_ & _heavy_ based on body mass
+1. Run logistic regression model with `body_mass_binary` as the dependent variable
+1. Based on the factor levels, _light_: 0 and _heavy_: 1
+
+   ```{r}
+   # Classify penguins into "light" & "heavy"
+   penguins <- penguins %>%
+     mutate(body_mass_binary = if_else(body_mass_g < 4750, "light", "heavy") %>%
+                               fct_relevel("light", "heavy"))
+   
+   # Run logistic regression model
+   log_regression_model <- glm(body_mass_binary ~ species + bill_length_mm +
+                                 bill_depth_mm + flipper_length_mm + sex,
+                               data = penguins,
+                               family = binomial(link = "logit"))
+   
+   summary(log_regression_model)
+   ```
+
+1. We can call `coef` and `summary` as before but to get odds ratios we must
+   exponentiate the beta coefficients using `exp`
+   ```{r}
+   exp(coef(summary(log_regression_model)))
+   ```
+
+1. We must likewise exponentiate the confidence intervals of the beta coefficients
+   to get the confidence intervals of the odds ratios
+   ```{r}
+   exp(confint.default(log_regression_model))
+   ```
+
+## Tabulating the results of a logistic regression {.smaller .scrollable} 
+
+1. We can make use of the of the [`tabulate_glm_result`](https://jeremylew.github.io/ezyr/reference/tabulate_glm_result.html){target="_blank"} function in the [`ezyr`](https://jeremylew.github.io/ezyr/reference/index.html){target="_blank"} package to tabulate our results
+1. Remember to set `exponentiate = TRUE` as we need to exponentiate the beta coefficients to get odds ratios
+
+```{r}
+log_regression_model %>%
+  tabulate_glm_result(exponentiate = TRUE) %>%
+  mutate(across(.cols = "variable_name", 
+                .fns = ~case_when(var0 == "header" ~ sprintf("**%s**", .x),
+                                  TRUE ~ sprintf("- %s", .x)))) %>%
+  mutate(across(.cols = "exp(Beta) (exp(95% CI))",
+                .fns = ~case_when(var0 == "Ref" ~ "Ref",
+                                  TRUE ~ .x))) %>%
+  mutate(across(.col = "p_value_",
+                .fns = ~case_when(p_value < 0.05 ~ sprintf("**%s**", .x),
+                                  TRUE ~ .x))) %>%
+  select(variable_name, "exp(Beta) (exp(95% CI))", p_value_) %>%
+  rename("Independent variables" = variable_name,
+         "Odds ratio (95% CI)" = "exp(Beta) (exp(95% CI))",
+         "p-value" = p_value_) %>%
+  kable(align = c("l", rep("r", 2))) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+                fixed_thead = T, full_width = T)
+```
 
 ## Inferring the coefficients {.scrollable}
 
