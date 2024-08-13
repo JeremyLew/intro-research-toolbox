@@ -960,14 +960,6 @@ flowchart LR
 3.  Diagnostics
     a.  Does the model fit our data well?
 
-<!-- ```{=html} -->
-<!-- ## Model specification
-
-1.  Look at the literature
-2.  Form an idea of a causal diagram
-3.  Check for multicollinearity -->
-<!-- ``` -->
-
 
 ## Why the need for GLM? {.smaller}
 
@@ -988,7 +980,7 @@ flowchart LR
 GLM consists of 2 components
 
 ::: {.callout-tip}
-# Component 1: What **distribution** does your outcome, $y_i$ take on?
+### Component 1: What **distribution** does your outcome, $y_i$ take on?
 
 \begin{align}
     y_i|X_i \sim \text{member of exponential family} \ \text{(e.g. $y_i$ is normally distributed)}
@@ -1001,7 +993,7 @@ i. $X_i$ represents the $i$-th observation of all your independent variables (e.
 :::
 
 ::: {.callout-warning}
-# Component 2: What is the **link function** $g$ you want to use?
+### Component 2: What is the **link function** $g$ you want to use?
 
 \begin{align}
     g(\mathbb{E}(y_i|X_i)) = X_i^{T} \beta = \underbrace{\beta_0 + \beta_1 age_i + \beta_2 gender_i + \beta_3 ethnicity_i + \cdots}_{\text{this linear combination is continuous}}
@@ -1020,14 +1012,14 @@ i.  It is the link function that enables the mapping of the continuous $X_i^{T}\
 When our outcome, $y_i$ is continuous and takes on real values (i.e. $y_i \in \mathbb{R}$), we may choose to model $y_i$ with a normal distribution
 
 ::: {.callout-tip}
-## Component 1: $y_i|x_i$ is normally distributed
+### Component 1: $y_i|x_i$ is normally distributed
 $$
 y_i | x_i \sim \mathcal{N}(X_i^{T}\beta, \sigma^2)
 $$
 :::
 
 ::: {.callout-warning}
-## Component 2: link function is the identity function i.e. no transformation done
+### Component 2: link function is the identity function i.e. no transformation done
 $$
 \mathbb{E}(y_i|x_i) = X_i^{T}\beta = \beta_0 + \beta_1age_i + \beta_2 gender_i + \beta_3 ethnicity_i + \cdots
 $$
@@ -1041,12 +1033,11 @@ $$
 1.  Notice the `family` argument contains the 2 components of the GLM we discussed earlier
     ```{r}
     #| code-line-numbers: "|2|6|8"
-    model <- 
-      glm(body_mass_g ~ species + bill_length_mm +
-                        bill_depth_mm + 
-                        flipper_length_mm + sex,
-          data = penguins,
-          family = gaussian(link = "identity"))
+    model <- glm(body_mass_g ~ species + bill_length_mm +
+                               bill_depth_mm + 
+                               flipper_length_mm + sex,
+                 data = penguins,
+                 family = gaussian(link = "identity"))
     
     summary(model)
     ```
@@ -1095,7 +1086,7 @@ model %>%
 When our outcome, $y_i$, is discrete and dichotomous (i.e. take two discrete values, 0-1, success-failure), we can model $y_i$ with a Bernoulli distribution
 
 ::: {.callout-tip}
-## Component 1: $y_i|x_i$ is Bernoulli distributed
+### Component 1: $y_i|x_i$ is Bernoulli distributed
 
 $$
 y_i | x_i \sim \mathrm{Bernoulli}(\pi_i)
@@ -1106,7 +1097,8 @@ $$
 :::
 
 ::: {.callout-warning}
-## Component 2: Link function, $g$, is the logit function
+### Component 2: Link function, $g$, is the logit function
+
 \begin{align}
     g(\mathbb{E}(y_i|x_i)) &= \underbrace{\mathrm{ln} \left( \frac{\mathbb{E}(y_i|x_i)}{1-\mathbb{E}(y_i|x_i)} \right)}_{logit[\mathbb{E}(y_i|x_i)]} = X_i^{T}\beta = \underbrace{\beta_0 + \beta_1 age_i + \beta_2 gender_i + \beta_3 ethnicity_i + \cdots}_{\text{this linear combination is continuous}} 
 \end{align}
@@ -1273,14 +1265,14 @@ Notes:
 When our outcome $y_i$, is continuous and positive, we can model $y_i$ with a Gamma distribution
 
 ::: {.callout-tip}
-## Component 1: $y_i$ is Gamma distributed
+### Component 1: $y_i$ is Gamma distributed
 $$ 
 y_i | X_i \sim Gamma(\alpha, \beta)
 $$
 :::
 
 ::: {.callout-warning}
-## Component 2: One choice of the link function, $g$, is the ln function
+### Component 2: One choice of the link function, $g$, is the ln function
 $$
 \begin{align*}
     g(\mathbb{E}(y_i|X_i)) = \mathrm{ln}\ \mathbb{E}(y_i|X_i) = \beta_0 + \beta_1 age_i + \beta_2 gender_i + \beta_3 ethnicity_i + \cdots \\
@@ -1397,12 +1389,12 @@ We will use the [mpcmp](https://thomas-fung.github.io/mpcmp/){target="_blank"}[@
 
 1. Cronbach's alpha is a measure of internal consistency of questionnaire
 1. Interpreting Cronbach’s alpha
-    i. Cronbach’s alpha between 0.70 to 0.80 is considered good enough[@fieldDiscoveringStatisticsUsing2012a]
+    i. Cronbach’s alpha between 0.70 to 0.80 is considered good enough[@fieldDiscoveringStatisticsUsing2012]
     i. Cronbach’s alpha is shown as raw_alpha in the output
 1. Caveats:
-    i. All else equal, alpha will increase as the number of items on the scale increases[@fieldDiscoveringStatisticsUsing2012a] (page 799, section 17.8.2)
-    i. If responses lack variability (i.e. almost everyone gives the same response), alpha tends to be poor[@fieldDiscoveringStatisticsUsing2012a] (page 803)
-    i. "If alpha is too high it may suggest that some items are redundant as they are testing the same question but in a different guise. A maximum alpha value of 0.90 has been recommended" [@tavakolMakingSenseCronbach2011a]
+    i. All else equal, alpha will increase as the number of items on the scale increases[@fieldDiscoveringStatisticsUsing2012] (page 799, section 17.8.2)
+    i. If responses lack variability (i.e. almost everyone gives the same response), alpha tends to be poor[@fieldDiscoveringStatisticsUsing2012] (page 803)
+    i. "If alpha is too high it may suggest that some items are redundant as they are testing the same question but in a different guise. A maximum alpha value of 0.90 has been recommended" [@tavakolMakingSenseCronbach2011]
 
 :::
 
@@ -1411,8 +1403,8 @@ We will use the [mpcmp](https://thomas-fung.github.io/mpcmp/){target="_blank"}[@
 ::: {.r-fit-text}
 
 1. We will use the Intraclass Correlation Coefficient to assess for test-retest reliability
-1. Out of the 10 variants of ICC, we will compute the "two-way mixed effects, absolute agreement, single rater/measurement" ICC variant or ICC (A,1) of McGraw and Wong[@mcgrawFormingInferencesIntraclass1996] per recommendations from[@kooGuidelineSelectingReporting2016a; @qinAssessingTestretestReliability2019]:
-1. When it comes to interpreting the ICC, according to Koo et al.[@kooGuidelineSelectingReporting2016a]:
+1. Out of the 10 variants of ICC, we will compute the "two-way mixed effects, absolute agreement, single rater/measurement" ICC variant or ICC (A,1) of McGraw and Wong[@mcgrawFormingInferencesIntraclass1996] per recommendations from[@kooGuidelineSelectingReporting2016; @qinAssessingTestretestReliability2019]:
+1. When it comes to interpreting the ICC, according to Koo et al.[@kooGuidelineSelectingReporting2016]:
     i. ICC less than 0.5: poor reliability
     i. ICC between 0.5 and 0.75: moderate reliability
     i. ICC between 0.75 and 0.90: good reliability
