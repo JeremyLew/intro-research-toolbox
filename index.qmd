@@ -1362,6 +1362,123 @@ When there is under- or over-dispersion, the poisson distribution no longer mode
 We will use the [mpcmp](https://thomas-fung.github.io/mpcmp/){target="_blank"}[@fungMpcmpMeanParametriziedConwayMaxwell2020] R package's implementation of the CMP~$\mu$~-regression
 
 
+## Different meaning under different contexts {.smaller}
+
+1. We can use a generalised linear model under different contexts
+   i. Descriptive: to reason about association(s) between independent variable(s) and dependent variable. This is the context we are operating under when we use e.g. a multivariable linear regression model in a cross sectional study
+   i. Causal inference: to reason about the causal effect of one variable on another
+   i. Prediction: to predict the dependent variable given new observations of independent variables
+
+1. Under different contexts
+   i. The assumptions made are different
+   i. The purpose of the model are different
+   i. The conclusions which you draw from the model are different
+
+## Use of a GLM in the causal inference context
+
+::: {.r-fit-text}
+
+1. We refer readers to the work of Judea Pearl[@pearlCausalInferenceStatistics2016]
+1. An example of a study in healthcare where GLM is used to infer causal associations from observational data is by Laura et al.[@lauraDepressiveSymptomsMalnutrition2022]
+1. A causal diagram which diagrams out the causal relationships between variables, in the form of a directed acyclic graph, is first posited
+1. Supposing that the causal relationships as expressed in the causal diagram were true, it proceeds that we can infer causal association between a variable of interest and the outcome by applying the theory e.g. back-door criterion, front-door criterion. Therefore, the variables of the regression model are chosen in accordance with the causal diagram e.g. to block all back-door paths between a variable of interest and the outcome.
+
+:::
+
+## Use of the GLM in the descriptive context {.scrollable}
+
+::: {.r-fit-text}
+
+1. My hypothesis is that before the technology of causal inference came about, people know of the problem of confounding in observational data. However, prior to the theory of causal inference, confounding was not well defined. There was no theoretical foundation that lays out how to deal with confounding in a mathematical precise way.
+1. In the context of using GLM (e.g. multivariable linear/logistic regression) in cross-sectional observational data, the GLM then was a means to reason/discuss about association, but we can only reason about association in the form of comparative statements of means and odds in the descriptive sense (examples are in the following slides) rather than causal associations. This is because we neither posited a causal diagram, nor did we identify a variable of interest and the back-door paths with the outcome. Instead we are looking if there are any statistically significant association among all independent variables chosen.
+1. When it comes to model specification (i.e. choosing the variables in the model), we would select all measurable variables (or proxy variables for unmeasurable ones) which we hypothesize from our domain clinical knowledge or literature review to have a causal relationship with the dependent/outcome variable (even though it was not set up for causal inference)
+1. Because the model is used for a descriptive purpose, having more variables (as your sample size allows for) that are of causal interest makes for a more informative descriptive study, simply for the reason that you have considered more variables that are of causal interest.
+
+:::
+
+## Logistic regression in the descriptive context {.scrollable}
+
+::: {.r-fit-text}
+
+1. Under the descriptive context, an example of the kind of comparative statements we make with the logistic regression model are as follows
+1. Categorical variable (e.g. age):
+   i. Patients aged < 40 years old (one of the categories of the categorical age variable) are more likely to be depressed (the category of the outcome/dependent variable coded as 1) compared to patients aged > 65 years old (reference category).
+   i. On average, if we were to compare a patient aged < 40 years old against another patient aged > 65 years old, where they only differ in age but who otherwise are same in the other variables in the model (i.e. same gender, same number of conditions etc.), then the odds of the patient aged < 40 years old being depressed is 3 times the odds of the patient aged > 65 years old being depressed.
+1. Continuous variable (e.g. EQ5D score):
+   i. Patients who score higher on the EQ5D utility index are less likely to be depressed compared to patients who score lower on the EQ5D index.
+   i. On average, if we were to compare patient A with EQ5D score of $x$ + 1 (where $x$ is any given value for EQ5D score) against patient B who has an EQ5D score of $x$, where patient A and B only differ by 1 unit of EQ5D score but who otherwise are same in the other variables in the model, then the odds of patient A being depressed is 0.02 times the odds of patient B being depressed.
+   i. Or we can also say that, for every increase of 1 point in EQ5D score, the odds of a patient being depressed decreases by 98% when controlling for other variables
+1. The odds ratio is statistically significantly different (or not) from 1.
+
+:::
+
+## Linear regression in the descriptive context
+
+::: {.r-fit-text}
+
+1. Under the descriptive context, an example of the kind of comparative statements we make with the linear regression model are as follows
+1. Categorical variable (e.g. age): On average, if we were to compare a patient aged < 40 years old against another patient aged > 65 years old (reference category), where they only differ in age category but who otherwise are same in the other variables in the model (i.e. same gender, same number of conditions etc.), then the PHQ9 score (dependent variable) of the patient aged < 40 years old is on average 5 units higher (beta coefficient of 5, a unit could be a point, 10 points etc.) than that of the patient aged > 65 years old.
+1. Continuous variable (e.g. EQ5D score): On average, if we were to compare patient A with EQ5D score of $x$ + 1 (where $x$ is any given value for EQ5D score) against patient B who has an EQ5D score of $x$, where patient A and B only differ by 1 unit of EQ5D score but who otherwise are same in the other variables in the model, then the EQ5D score of patient A is on average 3 units lower (beta coefficient of -3) than that of patient B.
+1. The beta coefficient is statistically significantly different (or not) from 0.
+
+:::
+
+## Use of the GLM in the prediction context
+
+::: {.r-fit-text}
+
+1. Aim is to fit a model that learns the correlation between dependent and independent variables on a "training" dataset which would then allow us to make our prediction on unseen "test data"
+1. Assumption here is that the data distribution of the test data is similar to the training data
+1. Here we are more concerned about selecting informative variables or creating variable(s) from transformation(s) of existing variables such that the model is able to capture the correlation between independent and dependent variables better, and hence achieve better predictive performance
+1. We are less concerned about statistical significance per se, but we may use it as a variable selection method in so far as it gives us better predictive performance
+
+:::
+
+
+# Analysis: Generalised linear mixed models
+
+## Mixed effects multinomial logistic regression model {.smaller .scrollable}
+
+The random intercept model is given as follows:
+
+$$
+\begin{align*}
+&ln \left(\frac{\pi_{2ij}}{\pi_{1ij}} \right) = \beta_{02} + \beta_{12}x_{ij} + u_{2j} \\
+&ln \left(\frac{\pi_{3ij}}{\pi_{1ij}} \right) = \beta_{03} + \beta_{13}x_{ij} + u_{3j} \\
+& \pi_{1ij} + \pi_{2ij} + \pi_{3ij} = 1
+\end{align*}
+$$
+
+$$
+\begin{bmatrix} 
+u_{2j} \\
+u_{3j} \\
+\end{bmatrix}
+\sim N \left( 
+\begin{bmatrix}
+0 \\
+0 \\
+\end{bmatrix}
+,
+\begin{pmatrix}
+  \sigma^2_{u2} & \\
+  \sigma_{u23} & \sigma^2_{u3} \\
+\end{pmatrix} 
+\right)
+$$
+
+Where:
+
+1. $y$ represents the outcome variable
+1. $x$ represents the independent variable
+1. $i$ represents the $i$-th observation in our dataset of e.g. N = 1,000
+1. $j$ represents the $j$-th group e.g. $J$ = 7 polyclinics
+1. $u_{2j}$ and $u_{3j}$ are the random intercepts corresponding to the $j$-th polyclinic
+1. $\pi_{1ij} = P(y_{ij} = 1)$, where 1 refers to the reference category of $y$
+1. $\pi_{2ij} = P(y_{ij} = 2)$, where 2 refers to the second category of $y$ 
+1. $\pi_{3ij} = P(y_{ij} = 3)$, where 3 refers to the third category of $y$
+
+
 
 
 # Analysis: Concordance
