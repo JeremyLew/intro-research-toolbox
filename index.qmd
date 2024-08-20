@@ -7,6 +7,8 @@ format:
   revealjs:
     slide-number: true
     embed-resources: true
+    controls: true
+    controls-layout: edges
     template-partials:
       - title-slide.html
 execute:
@@ -1627,22 +1629,130 @@ Where:
 
 ## Propensity score matching {.smaller}
 
-1. What is a propensity score?
 1. What is the purpose of propensity score matching?
+
+   - The purpose is to find a control group which is comparable to the intervention group from observational data
+   - We want the control and intervention groups to be comparable in the sense that they have similar covariate distributions
+
+1. What is a propensity score?
+   - The propensity score, $e_i$, for individual $i$ is the conditional probability of receiving the treatment/intervention (i.e. $T_i = 1$) given a set of observed covariates $X_i$ or $e_i(X_i) = P(T_i = 1 | X_i)$
+
+## How is propensity score matching done?
+
+::: {.r-fit-text}
+
 1. How is propensity score estimated?
-1. How is propensity score matching done?
+
+   i. The propensity score can be estimated using any model that models the relationship between a binary outcome and a set of covariates
+   i. The most commonly used model is the logistic regression model
+
+1. How is the matching done?
+   i. There are various methods of matching (e.g. nearest neighbour, optimal)
+   i. Most common matching method is nearest neighbour matching
+
+:::
+
+## Propensity score matching in R
+
+::: {.r-fit-text}
+
+1. We can use the [MatchIt](https://cran.r-project.org/web/packages/MatchIt/vignettes/MatchIt.html){target="_blank"} package to conduct propensity score matching
+1. The MatchIt package implements a variety of [matching methods](https://cran.r-project.org/web/packages/MatchIt/vignettes/matching-methods.html){target="_blank"} that we can choose from
+
+```{r}
+library(MatchIt)
+
+# Set seed for reproducibility
+set.seed(1234)
+
+# Set row names as ID column
+lalonde <- lalonde %>% rownames_to_column("ID")
+
+# Conduct propensity score matching
+match_obj <- matchit(
+  treat ~ age + educ + race + married + nodegree + re78,
+  data = lalonde,
+  method = "nearest", # nearest neighbour matching
+  distance = "glm", link = "logit", # default is logistic regression
+  replace = FALSE, # no replacement, each control unit can only be matched to one treated unit
+  ratio = 1 # 1:1 matching
+)
+
+print(match_obj)
+```
+
+:::
+
+## How do we evaluate covariate balance after matching? {.smaller}
+
+1. We make use of the absolute _standardized difference_ metric
+1. Rule of thumb
+
+## Evaluating covariate balance in R {.smaller .scrollable}
+
+```{r}
+# Get matched subjects
+matched_ids <- match.data(match_obj)$ID
+lalonde_matched <- lalonde %>% filter(ID %in% matched_ids)
+
+tableby(treat ~ age + educ + race + married + nodegree + re78,
+        data = lalonde,
+        control = tableby.control(numeric.stats = c("Nmiss", "meansd", "medianq1q3", "range"),
+                                  digits = 2, numeric.test = "kwt",
+                                  total = FALSE, test = FALSE)) %>%
+extend_tableby(lalonde, smd = TRUE, smd_digits = 2) %>%
+safe_left_join(
+  tableby(treat ~ age + educ + race + married + nodegree + re78,
+          data = lalonde_matched,
+          control = tableby.control(numeric.stats = c("Nmiss", "meansd", "medianq1q3", "range"),
+                                    digits = 2, numeric.test = "kwt",
+                                    total = FALSE, test = FALSE)) %>%
+  extend_tableby(lalonde_matched, smd = TRUE, smd_digits = 2) %>%
+  select(-Variable),
+  by = "marker") %>%
+select(-marker) %>%
+kable(align = c("l", rep("r", 6))) %>%
+column_spec(column = 1, width_min = "4.75cm") %>%
+column_spec(column = c(2, 3, 5, 6), width_min = "4.5cm") %>%
+column_spec(column = c(4, 7), width_min = "2.5cm") %>%
+kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"), fixed_thead = T, full_width = T) %>%
+add_header_above(c(" " = 1, "Before matching" = 3, "After matching" = 3))
+```
 
 ## How do we choose matching variables?
 
 
-## How do we evaluate covariate balance after matching?
+## Why use standardised difference and not p-value? {.smaller}
 
-1. We make use of the absolute _standardized mean difference (SMD)_ metric
-1. Rule of thumb
-1. p-values are not used because
+::: {.r-fit-text}
 
+The use of standardised difference to evaluate covariate balance is preferred over p-values from statistical tests (e.g. t-test, chi-square test) for the reasons as follows
 
+1. A p-value from a statistical test is affected by sample size while standardised difference is not[@stuartMatchingMethodsCausal2010a; @austinBalanceDiagnosticsComparing2009]
+	 i. If the sample size is small and hence we have a lack of power, we may get a non-significant p-value (suggesting balance) due to the lack of power, even though the groups are actually imbalanced
+	 i. Conversely, if the sample size is large, we may see a significant p-value due to high power (suggesting imbalance), when the groups are effectively balanced with very small differences between the groups
+1. Covariate balance should be a property of the data sample without any reference to the population from which we obtain the data[@stuartMatchingMethodsCausal2010a]
+	 i. The standardised difference directly assesses balance between samples by comparing (i) means in relation to standard deviation for continuous variables, and (ii) proportions for categorical variables
+	 i. But with p-values we are making inferential statements about the population from which we sample our data
 
+:::
+
+## Considerations of M:1 matching {.scrollable}
+
+::: {.r-fit-text}
+
+1. What are some considerations when we conduct many-to-one ($M:1$) matching? i.e. match multiple control patients to each intervention group patient
+1. There is a bias-variance trade-off going on when we vary $M$
+1. On the one hand, poorer covariate balance between treatment and control group at baseline is observed when we increase $M$
+	 i. This is because matching quality drops as $M$ is increased e.g. if $M = 4$, the fourth control matched to a treatment group patient might not be as close in propensity score compared to the first/second control matched to that same treatment group patient
+	 i. If we do have imbalanced treatment and control groups at baseline, then the treatment effect estimate would be biased (i.e. higher or lower than the true value) due to confounding. So if we match with $M > 1$, we just have to make sure that we achieve adequate balance in our treatment and control groups at baseline
+1. On the other hand, increasing $M$ (and hence increasing the sample size of the control group) increases the precision (i.e. decreases sampling variability) of the treatment effect estimate
+   i. This shows up as narrower 95% confidence intervals of the treatment effect estimate
+	 i. The 95% confidence interval means that if you were to repeat your exercise (i.e. collect data again in the same way, do the matching and estimate the treatment effect) multiple times, 95 out of the 100 times, your treatment effect estimate will fall within the given confidence interval
+	 i. A narrower confidence interval means that your treatment effect estimate is more precise (i.e. less variable across repeats of your exercise)
+	 i. Thus with a narrower 95% CI, you would be more confident in your treatment effect estimate, as opposed to if the 95% CI were wider which would mean that the treatment effect could take on a wide range of values across different repeats of your exercise
+
+:::
 
 # Analysis: Intervention effect estimation
 
